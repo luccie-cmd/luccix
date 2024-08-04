@@ -1,0 +1,20 @@
+func [NAME]([ARG NAME]: [ARG TYPE]): [RETURN TYPE] {}
+
+VARIABLES
+var [NAME]: [ARG TYPE];
+var [NAME]: [ARG TYPE] = [EXPRESSION]
+[NAME] = [EXPRESSION]
+
+TYPES
+Return types and arg types can be:
+    [TYPE]*
+    INT
+    CHAR
+    STRING
+    STRUCT
+Return types can be:
+    VOID
+
+OUTPUT FORMAT
+The output format of the compiler will be either; the AST in textual form; the IR in text form, the raw intel assembly or an Orion executable.
+these formats can be outputted all at the same time, the file where to output them is depended on the flag (so --ast <file> will output the AST to <file>)
