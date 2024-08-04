@@ -1,7 +1,3 @@
 commands.txt
-tmp.txt
-tmp.py
+tmp.*
 out/
-src/
-include/
-tests/
