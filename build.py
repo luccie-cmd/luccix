@@ -62,7 +62,7 @@ def compareFiles(file1, file2):
     except FileNotFoundError:
         return False
 
-def buildAsm(compiler: str, file: str, out_file: str, out_format: str, extra_args: list[str]) -> None:
+def buildAsm(compiler: str, file: str, out_file: str, out_format: str, extra_args: list[str]):
     print(f"ASM   {file}")
     options = extra_args.copy()
     if compiler == "nasm":
@@ -82,7 +82,10 @@ def buildAsm(compiler: str, file: str, out_file: str, out_format: str, extra_arg
     command = compiler
     for arg in options:
         command += f' {arg}'
-    callCmd(command)
+    code, _ = callCmd(command)
+    if code != 0:
+        print(f"ASM   {file} Failed")
+    return code
 
 def buildC(compiler, file, out_file, extra_args: list[str]):
     print(f"C     {file}")
@@ -98,7 +101,10 @@ def buildC(compiler, file, out_file, extra_args: list[str]):
     command = compiler
     for arg in options:
         command += f' {arg}'
-    callCmd(command)
+    code, _ = callCmd(command)
+    if code != 0:
+        print(f"C     {file} Failed")
+    return code
 
 def checkExtension(file: str, valid_extensions: list[str]):
     for ext in valid_extensions:
@@ -122,19 +128,26 @@ def buildDir(directory_path: str, out_path: str, extra_args: list[str]=[]) -> in
             continue
         if not checkExtension(file, ["asm", "c", "lx", "cc", "cpp"]):
             continue
-        callCmd(toCommand("cpp", extra_args+['-o', './tmp.txt', file]))
+        code, _ = callCmd(toCommand("cpp", extra_args+['-o', './tmp.txt', file]))
+        if code != 0:
+            print(f"Failed to pre process {file}")
+            exit(1)
         if compareFiles(f"./tmp.txt", os.path.abspath(f"/tmp/{basename}/cache/{file}")):
             continue
         callCmd(toCommand("mkdir", ['-p', f'{out_path}/{os.path.dirname(file)}']))
         callCmd(toCommand("mkdir", ['-p', f'/tmp/{basename}/cache/{os.path.dirname(file)}']))
         callCmd(f"cp ./tmp.txt /tmp/{basename}/cache/{file}")
+        code = 0
         if getExtension(file) == "asm":
-            buildAsm("nasm", file, out_path+'/'+file, "elf", extra_args)
+            code = buildAsm("nasm", file, out_path+'/'+file, "elf", extra_args)
         elif getExtension(file) == "c":
-            buildC("gcc", file, out_path+'/'+file, extra_args)
+            code = buildC("gcc", file, out_path+'/'+file, extra_args)
         else:
             print(f"Invalid or unhandled extension for {file} {getExtension(file)}")
             callCmd(f"rm -f /tmp/{basename}/cache/{file}")
+        if code != 0:
+            callCmd(f"rm -f /tmp/{basename}/cache/{file}")
+            exit(code)
 
 def linkDir(directory_path: str, out_file: str, extra_args: list[str]=[]):
     obj_files_with_dir = glob.glob(directory_path+'/**', recursive=True)
