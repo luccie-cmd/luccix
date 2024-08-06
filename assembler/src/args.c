@@ -18,11 +18,12 @@ static void check_args(luccix_assembler_args *args){
         free(args);
         exit(1);
     }
-    args->inputFile = args->inputFiles.elements[0];
+    args->inputFile = luccix_assembler_list_idx(args->inputFiles, 0);
 }
 
 luccix_assembler_args* parse_args(int argc, char** argv){
     luccix_assembler_args *args = malloc(sizeof(args[0]));
+    memset(args, 0, sizeof(args[0]));
     luccix_assembler_list_init(args->inputFiles);
     args->useColor = 1;
     int i = 1;
