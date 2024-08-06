@@ -1,5 +1,6 @@
 #pragma once
 #include "diag.h"
+#include <stddef.h>
 
 typedef struct luccix_assembler_lexer{
     const char* inData;
