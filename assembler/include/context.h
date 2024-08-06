@@ -11,3 +11,4 @@ typedef struct luccix_assembler_context{
 } luccix_assembler_context;
 
 luccix_assembler_context* context_from_args(luccix_assembler_args* args);
+void context_destroy(luccix_assembler_context* context);

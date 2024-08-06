@@ -9,3 +9,9 @@ luccix_assembler_context* context_from_args(luccix_assembler_args* args){
     context->lexer = lexer_from_file(context->inputFile, context->diag);
     return context;
 }
+
+void context_destroy(luccix_assembler_context* context){
+    lexer_destroy(context->lexer);
+    free(context->diag);
+    free(context);
+}
