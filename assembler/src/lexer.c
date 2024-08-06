@@ -68,7 +68,7 @@ static luccix_assembler_list(luccix_assembler_token*)lexLine(luccix_assembler_le
             case 'K': case 'L': case 'M': case 'N': case 'O':
             case 'P': case 'Q': case 'R': case 'S': case 'T':
             case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
-            case '_': {
+            case '_': case '.': {
                 token = lexIdentifier(this);
             } break;
 
