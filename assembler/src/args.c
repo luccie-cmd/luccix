@@ -5,15 +5,15 @@
 
 // TODO(luccie): Handle output format (elf, binary, orion)
 
-static void check_args(luccix_args *args){
+static void check_args(luccix_assembler_args *args){
     if(args->outFile == NULL){
         args->outFile = "./a.out";
     }
-    if(luccix_list_len(args->inputFiles) == 0){
+    if(luccix_assembler_list_len(args->inputFiles) == 0){
         printf("ERROR: No input file was provided\n");
         free(args);
         exit(1);
-    } else if(luccix_list_len(args->inputFiles) >= 2){
+    } else if(luccix_assembler_list_len(args->inputFiles) >= 2){
         printf("ERROR: Can only handle 1 input file at a time\n");
         free(args);
         exit(1);
@@ -21,17 +21,20 @@ static void check_args(luccix_args *args){
     args->inputFile = args->inputFiles.elements[0];
 }
 
-luccix_args* parse_args(int argc, char** argv){
-    luccix_args *args = malloc(sizeof(args[0]));
-    luccix_list_init(args->inputFiles);
+luccix_assembler_args* parse_args(int argc, char** argv){
+    luccix_assembler_args *args = malloc(sizeof(args[0]));
+    luccix_assembler_list_init(args->inputFiles);
+    args->useColor = 1;
     int i = 1;
     for(; i < argc;){
         if(strcmp(argv[i], "-v") == 0){
             args->verbose = 1;
         } else if(strcmp(argv[i], "-o") == 0){
             args->outFile = argv[++i];
+        } else if(strcmp(argv[i], "--color") == 0){
+            args->useColor = strcmp(argv[++i], "never") == 0 ? 0 : 1;
         } else{
-            luccix_list_push(args->inputFiles, argv[i]);
+            luccix_assembler_list_push(args->inputFiles, argv[i]);
         }
         i++;
     }
@@ -39,7 +42,7 @@ luccix_args* parse_args(int argc, char** argv){
     return args;
 }
 
-void print_args(luccix_args* args){
+void print_args(luccix_assembler_args* args){
     printf("Output file %s\n", args->outFile);
     printf("Input file %s\n", args->inputFile);
     // TODO(luccie): Make this report a string
@@ -49,4 +52,5 @@ void print_args(luccix_args* args){
     // TODO(luccie): Make this report a string
     printf("Output file format %d\n", args->outputFormat);
     printf("Verbose on %s\n", args->verbose ? "Yes" : "No");
+    printf("Using colors %s\n", args->useColor ? "Yes" : "No");
 }
