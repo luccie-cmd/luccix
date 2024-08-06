@@ -2,6 +2,7 @@
 import os, sys, glob, subprocess
 basename = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
 out_dir = ""
+changed = False
 # ANSI Color Codes
 ANSI_COLOR_RESET = "\x1b[0m"
 ANSI_COLOR_BLACK = "\x1b[30m"
@@ -53,6 +54,8 @@ def callCmd(command):
     if result.returncode != 0:
         print(result.stderr)
     return [result.returncode, result.stdout]
+
+callCmd("rm -f commands.txt")
 
 def compareFiles(file1, file2):
     try:
@@ -153,6 +156,8 @@ def buildDir(directory_path: str, out_path: str, extra_args: list[str]=[]) -> in
             exit(1)
         if compareFiles(f"./tmp.txt", os.path.abspath(f"/tmp/{basename}/cache/{file}")):
             continue
+        global changed
+        changed = True
         callCmd(toCommand("mkdir", ['-p', f'{out_path}/{os.path.dirname(file)}']))
         callCmd(toCommand("mkdir", ['-p', f'/tmp/{basename}/cache/{os.path.dirname(file)}']))
         callCmd(f"cp ./tmp.txt /tmp/{basename}/cache/{file}")
@@ -171,6 +176,8 @@ def buildDir(directory_path: str, out_path: str, extra_args: list[str]=[]) -> in
             exit(code)
 
 def linkDir(directory_path: str, out_file: str, extra_args: list[str]=[]):
+    if not changed:
+        return
     obj_files_with_dir = glob.glob(directory_path+'/**', recursive=True)
     options = extra_args.copy()
     for file in obj_files_with_dir:
