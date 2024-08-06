@@ -237,7 +237,7 @@ def main():
     callCmd(f"mkdir -p {out_dir}")
     removeUnecessary(out_dir, "./assembler/src")
     print("[ ] Building assembler...")
-    if buildAndLinkDir("./assembler/src", out_dir, out_dir+'/assembler.exe', ['-I./assembler/include']):
+    if buildAndLinkDir("./assembler/src", out_dir, out_dir+'/assembler.exe', ['-I./assembler/include', '-O2'], ['-O2']):
         print(f"[{ANSI_COLOR_BRIGHT_GREEN}X{ANSI_COLOR_RESET}] Building assembler")
     else:
         print(f"[{ANSI_COLOR_RED}X{ANSI_COLOR_RESET}] Building assembler")
