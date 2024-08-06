@@ -35,4 +35,6 @@
         (L) = NULL; \
     } while (0)
 
+#define ARRAY_SIZE(A) sizeof((A))/sizeof((A)[0])
+
 char* readFile(const char* file_path);

@@ -17,10 +17,9 @@ int main(int argc, char** argv){
     while(line != NULL && luccix_assembler_list_len(line) != 0 && context->lexer->status == LEXER_STATUS_DONE){
         // printf("Line = `%s`\n", line);
         for(size_t i = 0; i < luccix_assembler_list_len(line); ++i){
-            printf("Token data = `%s`\n", luccix_assembler_list_idx(line, i)->data);
+            printf("Token data = `%s` Token type = %s\n", luccix_assembler_list_idx(line, i)->data, tokenTypeToCstr(luccix_assembler_list_idx(line, i)->type));
         }
         luccix_assembler_list_free(line);
-        printf("Next line\n");
         line = context->lexer->lexLine(context->lexer);
     }
     luccix_assembler_list_free(line);
