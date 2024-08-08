@@ -47,6 +47,12 @@ ANSI_BG_COLOR_BRIGHT_WHITE = "\x1b[47;1m"
 ANSI_STYLE_BOLD = "\x1b[1m"
 ANSI_STYLE_UNDERLINE = "\x1b[4m"
 
+CONFIG = {
+    "CFLAGS": ["-std=c11"],
+    "CXXFLAGS": ["-std=c++20", 'fno-rtti', '-fno-exceptions'],
+    "CCXXFLAGS": ["-Wall", '-Wextra', "-Werror"]
+}
+
 def callCmd(command):
     with open("commands.txt", "a+") as f:
         f.write(command+'\n')
@@ -94,11 +100,9 @@ def buildAsm(compiler: str, file: str, out_file: str, out_format: str, extra_arg
 def buildCXX(compiler, file, out_file, extra_args: list[str]):
     print(f"CXX   {file}")
     options = extra_args.copy()
-    options.append("-std=c++20")
-    options.append('-Wall')
-    options.append('-Wextra')
-    options.append('-Werror')
     options.append("-c")
+    options += CONFIG.get("CFLAGS")
+    options += CONFIG.get("CCXXFLAGS")
     options.append("-o")
     options.append(out_file+'.o')
     options.append(file)
@@ -113,11 +117,9 @@ def buildCXX(compiler, file, out_file, extra_args: list[str]):
 def buildC(compiler, file, out_file, extra_args: list[str]):
     print(f"C     {file}")
     options = extra_args.copy()
-    options.append("-std=c11")
-    options.append('-Wall')
-    options.append('-Wextra')
-    options.append('-Werror')
     options.append("-c")
+    options += CONFIG.get("CFLAGS")
+    options += CONFIG.get("CCXXFLAGS")
     options.append("-o")
     options.append(out_file+'.o')
     options.append(file)
