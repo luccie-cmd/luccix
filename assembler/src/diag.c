@@ -53,7 +53,7 @@ static void print(struct luccix_diagnostic* this, luccix_diagnostic_level level,
     if(this->useColor){
         printf("%s", diagnostic_level_to_cstr_color(level));
     }
-    printf("\n%s: ", level_to_cstr(level));
+    printf("%s: ", level_to_cstr(level));
     printf("%s", ANSI_COLOR_RESET);
     va_list args;
     va_start(args, fmt);
