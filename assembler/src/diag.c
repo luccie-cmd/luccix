@@ -70,6 +70,21 @@ static void printVerbose(struct luccix_diagnostic* this, const char* fmt, ...){
     va_end(args);
 }
 
+static void addTrace(struct luccix_diagnostic* this, const char* func){
+    luccix_assembler_list_push(this->stackTraceList, func);
+}
+
+static void popTrace(struct luccix_diagnostic* this){
+    luccix_assembler_list_len(this->stackTraceList) -= 1;
+}
+
+static void printTrace(struct luccix_diagnostic* this){
+    printf("Stack trace\n");
+    for(size_t i = 0; i < luccix_assembler_list_len(this->stackTraceList); ++i){
+        printf("%s\n", luccix_assembler_list_idx(this->stackTraceList, i));
+    }
+}
+
 luccix_diagnostic* diagnostic_from_args(int useColor, int verbose){
     luccix_diagnostic* diag = malloc(sizeof(diag[0]));
     diag->useColor = useColor;
@@ -77,5 +92,8 @@ luccix_diagnostic* diagnostic_from_args(int useColor, int verbose){
     diag->print = print;
     diag->vprint = vprint;
     diag->printVerbose = printVerbose;
+    diag->addTrace = addTrace;
+    diag->popTrace = popTrace;
+    diag->printTrace = printTrace;
     return diag;
 }
