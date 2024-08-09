@@ -1,7 +1,8 @@
 #include <diag.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ansi.h>
+#include <util.h>
+#include <assert.h>
 
 static const char* diagnostic_level_to_cstr_color(luccix_diagnostic_level level){
     switch(level){
@@ -71,17 +72,18 @@ static void printVerbose(struct luccix_diagnostic* this, const char* fmt, ...){
 }
 
 static void addTrace(struct luccix_diagnostic* this, const char* func){
-    luccix_assembler_list_push(this->stackTraceList, func);
+    util_da_push(this->stackTraceList, func);
 }
 
 static void popTrace(struct luccix_diagnostic* this){
-    luccix_assembler_list_len(this->stackTraceList) -= 1;
+    assert(util_da_count(this->stackTraceList) > 0);
+    util_da_pop(this->stackTraceList);
 }
 
 static void printTrace(struct luccix_diagnostic* this){
     printf("Stack trace\n");
-    for(size_t i = 0; i < luccix_assembler_list_len(this->stackTraceList); ++i){
-        printf("%s\n", luccix_assembler_list_idx(this->stackTraceList, i));
+    for(int64_t i = 0; i < (int64_t)util_da_count(this->stackTraceList); ++i){
+        printf("%s\n", this->stackTraceList[i]);
     }
 }
 

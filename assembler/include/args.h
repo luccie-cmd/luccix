@@ -11,7 +11,7 @@ typedef enum luccix_assembler_args_out_format{
 typedef struct luccix_assembler_args{
     const char* outFile;
     const char* inputFile;
-    luccix_assembler_list(const char*) inputFiles;
+    util_da(const char*) inputFiles;
     luccix_assembler_args_out_format outputFormat;
     int verbose : 1;
     int useColor : 1;

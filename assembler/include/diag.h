@@ -13,7 +13,7 @@ typedef enum luccix_diagnostic_level {
 typedef struct luccix_diagnostic{
     int useColor;
     int verbose;
-    luccix_assembler_list(const char*) stackTraceList;
+    util_da(const char*) stackTraceList;
     void (*vprint)(struct luccix_diagnostic* this, const char* fmt, va_list args);
     void (*printVerbose)(struct luccix_diagnostic* this, const char* fmt, ...);
     void (*print)(struct luccix_diagnostic* this, luccix_diagnostic_level level, const char* fmt, ...);

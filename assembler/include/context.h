@@ -1,5 +1,6 @@
 #pragma once
 #include "lexer.h"
+#include "parser.h"
 #include "args.h"
 #include "diag.h"
 
@@ -7,6 +8,7 @@ typedef struct luccix_assembler_context{
     const char* inputFile;
     const char* outputFile;
     luccix_assembler_lexer* lexer;
+    luccix_assembler_parser* parser;
     luccix_diagnostic* diag;
 } luccix_assembler_context;
 

@@ -14,7 +14,7 @@ tokenDataTokenTypePair pairs[] = {
 };
 
 static luccix_assembler_token_type dataToInstOrKeyword(const char* data){
-    for(size_t i = 0; i < ARRAY_SIZE(pairs); ++i){
+    for(uint64_t i = 0; i < sizeof(pairs)/sizeof(pairs[0]); ++i){
         if(strcmp(pairs[i].data, data) == 0){
             return pairs[i].type;
         }
@@ -25,7 +25,7 @@ static luccix_assembler_token_type dataToInstOrKeyword(const char* data){
 char buffer[2];
 
 const char* tokenTypeToCstr(luccix_assembler_token_type type){
-    for(size_t i = 0; i < ARRAY_SIZE(pairs); ++i){
+    for(uint64_t i = 0; i < sizeof(pairs)/sizeof(pairs[0]); ++i){
         if(pairs[i].type == type){
             return pairs[i].data;
         }
@@ -65,6 +65,6 @@ luccix_assembler_token* createToken(luccix_assembler_token_type type, const char
     return token;
 }
 void tokenDestroy(luccix_assembler_token* this){
-    luccix_assembler_list_free(this->data);
-    free(this);
+    util_deallocate(util_default_allocator, (void*)this->data);
+    util_deallocate(util_default_allocator, this);
 }

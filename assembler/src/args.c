@@ -9,22 +9,22 @@ static void check_args(luccix_assembler_args *args){
     if(args->outFile == NULL){
         args->outFile = "./a.out";
     }
-    if(luccix_assembler_list_len(args->inputFiles) == 0){
+    if(util_da_count(args->inputFiles) == 0){
         printf("ERROR: No input file was provided\n");
         free(args);
         exit(1);
-    } else if(luccix_assembler_list_len(args->inputFiles) >= 2){
+    } else if(util_da_count(args->inputFiles) >= 2){
         printf("ERROR: Can only handle 1 input file at a time\n");
         free(args);
         exit(1);
     }
-    args->inputFile = luccix_assembler_list_idx(args->inputFiles, 0);
+    args->inputFile = args->inputFiles[0];
 }
 
 luccix_assembler_args* parse_args(int argc, char** argv){
     luccix_assembler_args *args = malloc(sizeof(args[0]));
     memset(args, 0, sizeof(args[0]));
-    luccix_assembler_list_init(args->inputFiles);
+    util_da_reserve(args->inputFiles, 1);
     args->useColor = 1;
     int i = 1;
     for(; i < argc;){
@@ -35,7 +35,7 @@ luccix_assembler_args* parse_args(int argc, char** argv){
         } else if(strcmp(argv[i], "--color") == 0){
             args->useColor = strcmp(argv[++i], "never") == 0 ? 0 : 1;
         } else{
-            luccix_assembler_list_push(args->inputFiles, argv[i]);
+            util_da_push(args->inputFiles, argv[i]);
         }
         i++;
     }

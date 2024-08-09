@@ -9,7 +9,7 @@ static void lexerAdvance(luccix_assembler_lexer* this){
     if(this->c == '\0' && this->idx != 0){
         return;
     }
-    if(this->idx > strlen(this->inData)){
+    if(this->idx > (int64_t)strlen(this->inData)){
         this->diag->print(this->diag, DIAG_LEVEL_ICE, "Check for EOF failed\nIDX = %ld max IDX = %ld\n", this->idx, strlen(this->inData));
         exit(1);
     }
@@ -27,33 +27,31 @@ static int isContinueIdentifier(char c){
 }
 
 static luccix_assembler_token* lexNumber(luccix_assembler_lexer* this){
-    luccix_assembler_list(char) data;
-    luccix_assembler_list_init(data);
-    luccix_assembler_list_push(data, this->c);
+    util_string data = util_string_create(util_default_allocator);
+    util_string_append_rune(&data, this->c);
     lexerAdvance(this);
     while(isdigit(this->c)){
-        luccix_assembler_list_push(data, this->c);
+        util_string_append_rune(&data, this->c);
         lexerAdvance(this);
     }
-    return createToken(TOKEN_TYPE_NUMBER, (const char*)data);
+    return createToken(TOKEN_TYPE_NUMBER, util_string_as_cstring(data));
 }
 
 static luccix_assembler_token* lexIdentifier(luccix_assembler_lexer* this){
-    luccix_assembler_list(char) data;
-    luccix_assembler_list_init(data);
-    luccix_assembler_list_push(data, this->c);
+    util_string data = util_string_create(util_default_allocator);
+    util_string_append_rune(&data, this->c);
     lexerAdvance(this);
     while(isContinueIdentifier(this->c)){
-        luccix_assembler_list_push(data, this->c);
+        util_string_append_rune(&data, this->c);
         lexerAdvance(this);
     }
-    return createToken(TOKEN_TYPE_IDENTIFIER, (const char*)data);
+    return createToken(TOKEN_TYPE_IDENTIFIER, util_string_as_cstring(data));
 }
 
-static luccix_assembler_list(luccix_assembler_token*)lexLine(luccix_assembler_lexer* this){
+static util_da(luccix_assembler_token*) lexLine(luccix_assembler_lexer* this){
     lexerSkipWhitespace(this);
-    luccix_assembler_list(luccix_assembler_token*) line;
-    luccix_assembler_list_init(line);
+    util_da(luccix_assembler_token*) line;
+    util_da_reserve(line, 1);
     while(this->c != '\n' && this->c != '\0' && this->status != LEXER_STATUS_ERROR){
         lexerSkipWhitespace(this);
         luccix_assembler_token* token = NULL;
@@ -92,17 +90,21 @@ static luccix_assembler_list(luccix_assembler_token*)lexLine(luccix_assembler_le
             } break;
         }
         if(token == NULL){
+        util_da_push(line, createToken(TOKEN_TYPE_EOF, "\0"));
             return line;
         }
-        luccix_assembler_list_push(line, token);
+        util_da_push(line, token);
     }
     lexerAdvance(this);
+    if(this->c == '\0'){
+        util_da_push(line, createToken(TOKEN_TYPE_EOF, "\0"));
+    }
     return line;
 }
 
 luccix_assembler_lexer* lexer_from_file(const char* inFile, luccix_diagnostic* diag){
     luccix_assembler_lexer* lexer = malloc(sizeof(lexer[0]));
-    lexer->inData = readFile(inFile);
+    lexer->inData = util_string_as_cstring(util_file_read(util_default_allocator, inFile));
     lexer->status = LEXER_STATUS_DONE;
     lexer->idx = 0;
     lexer->diag = diag;

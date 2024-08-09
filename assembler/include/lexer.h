@@ -6,8 +6,8 @@
 
 typedef struct {
     luccix_assembler_token** elements;
-    size_t count;
-    size_t capacity;
+    int64_t count;
+    int64_t capacity;
 } luccix_assembler_token_list;
 
 typedef enum luccix_assembler_lexer_status{
@@ -19,10 +19,10 @@ typedef enum luccix_assembler_lexer_status{
 typedef struct luccix_assembler_lexer{
     const char* inData;
     char c;
-    size_t idx;
+    int64_t idx;
     luccix_diagnostic* diag;
     luccix_assembler_lexer_status status;
-    luccix_assembler_list(luccix_assembler_token*) (*lexLine)(struct luccix_assembler_lexer* this);
+    util_da(luccix_assembler_token*) (*lexLine)(struct luccix_assembler_lexer* this);
 } luccix_assembler_lexer;
 
 luccix_assembler_lexer* lexer_from_file(const char* inFile, luccix_diagnostic* diag);

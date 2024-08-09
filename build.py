@@ -50,7 +50,7 @@ ANSI_STYLE_UNDERLINE = "\x1b[4m"
 CONFIG = {
     "CFLAGS": ["-std=c11"],
     "CXXFLAGS": ["-std=c++20", 'fno-rtti', '-fno-exceptions'],
-    "CCXXFLAGS": ["-Wall", '-Wextra', "-Werror"]
+    "CCXXFLAGS": ["-Wall", '-Wextra', "-Werror", "-fmax-errors=1"]
 }
 
 def callCmd(command):
@@ -170,9 +170,9 @@ def buildDir(directory_path: str, out_path: str, extra_args: list[str]=[]) -> in
         if getExtension(file) == "asm":
             code = buildAsm("nasm", file, out_path+'/'+file, "elf", extra_args)
         elif getExtension(file) == "c":
-            code = buildC("clang", file, out_path+'/'+file, extra_args)
+            code = buildC("gcc", file, out_path+'/'+file, extra_args)
         elif getExtension(file) == "cc" or getExtension(file) == "cpp":
-            code = buildCXX("clang++", file, out_path+'/'+file, extra_args)
+            code = buildCXX("g++", file, out_path+'/'+file, extra_args)
         else:
             print(f"Invalid or unhandled extension for {file} {getExtension(file)}")
             callCmd(f"rm -f /tmp/{basename}/cache/{file}")
