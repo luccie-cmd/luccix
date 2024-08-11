@@ -8,10 +8,10 @@ namespace luccix::assembler{
 class Context{
     private:
         std::string outputFile;
-        Lexer* lexer;
-        Diag* diag;
     public:
-        Context(std::string inData, std::string outDir, bool verbose, bool useColors);
+        Diag* diag;
+        Lexer* lexer;
+        Context(std::string inData, std::string inFileName, std::string outDir, bool verbose, bool useColors);
         ~Context();
 };
 }

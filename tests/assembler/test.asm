@@ -1,4 +1,4 @@
-global _start
+global_start
 _start:
     mov rax, 60
     syscall

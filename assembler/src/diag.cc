@@ -83,6 +83,8 @@ namespace luccix::assembler{
     Diag::Diag(bool useColors, bool isVerbose){
         this->colors = useColors;
         this->verbose = isVerbose;
+        this->stackTrace.clear();
+        this->stackTrace.push_back("int main(int, char**)");
     }
 
     Diag::~Diag(){}
@@ -113,19 +115,62 @@ namespace luccix::assembler{
         va_end(args);
     }
 
+    void Diag::print(Location *loc, DiagLevel level, const char* fmt, ...){
+        loc->print();
+        if(this->colors){
+            std::printf("%s", DiagLevelToCstr(level).c_str());
+        }
+        printf("%s: ", LevelToCstr(level).c_str());
+        printf("%s", ANSI_COLOR_RESET);
+        va_list args;
+        va_start(args, fmt);
+        this->vprint(fmt, args);
+        va_end(args);
+    }
+
     void Diag::addTrace(std::string functionName){
-        this->stackTrace.push(functionName);
+        this->stackTrace.push_back(functionName);
     }
 
     void Diag::popTrace(){
-        this->stackTrace.pop();
+        this->stackTrace.pop_back();
     }
 
     void Diag::printTrace(){
         std::printf("Stack trace:\n");
-        for(int64_t i = 0; i < (int64_t)this->stackTrace.size(); ++i){
-            std::printf("%s\n", this->stackTrace.top().c_str());
-            this->stackTrace.pop();
+        for(std::string trace : this->stackTrace){
+            std::printf("%s\n", trace.c_str());
         }
+    }
+
+    Location::Location(std::string name){
+        this->fileName = name;
+        this->coll = 1;
+        this->row = 1;
+    }
+
+    Location::Location(std::string fileName, std::size_t coll, std::size_t row){
+        this->fileName = fileName;
+        this->coll = coll;
+        this->row = row;
+    }
+
+    Location::~Location(){}
+
+    void Location::print(){
+        std::printf("%s:%ld:%ld: ", this->fileName.c_str(), this->row, this->coll);
+    }
+
+    void Location::update(std::size_t newColl, std::size_t newRow){
+        this->coll = newColl;
+        this->row = newRow;
+    }
+
+    std::size_t Location::getRow(){
+        return this->row;
+    }
+
+    std::size_t Location::getColl(){
+        return this->coll;
     }
 }

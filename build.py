@@ -193,7 +193,7 @@ def linkDir(directory_path: str, out_file: str, extra_args: list[str]=[]):
         options.append(file)
     options.append("-o")
     options.append(out_file)
-    callCmd(toCommand("gcc", options))
+    callCmd(toCommand("g++", options))
 
 def buildAndLinkDir(path: str, out_path: str, out_file: str, extra_comp_args=[], extra_link_args=[]):
     buildDir(path, out_path, extra_comp_args)

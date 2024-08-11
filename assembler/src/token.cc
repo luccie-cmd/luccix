@@ -13,7 +13,7 @@ struct tokenDataTokenTypePair pairs[] = {
 };
 
 static TokenType dataToInstOrKeyword(std::string data){
-    for(uint64_t i = 0; i < sizeof(pairs)/sizeof(pairs[0]); ++i){
+    for(std::size_t i = 0; i < sizeof(pairs)/sizeof(pairs[0]); ++i){
         if(data == pairs[i].data){
             return pairs[i].type;
         }
@@ -21,8 +21,15 @@ static TokenType dataToInstOrKeyword(std::string data){
     return TokenType::Identifier;
 }
 
+TokenType Token::getType(){
+    return this->type;
+}
+std::string Token::getData(){
+    return this->data;
+}
+
 std::string tokenTypeToCstr(TokenType type){
-    for(uint64_t i = 0; i < sizeof(pairs)/sizeof(pairs[0]); ++i){
+    for(std::size_t i = 0; i < sizeof(pairs)/sizeof(pairs[0]); ++i){
         if(pairs[i].type == type){
             return pairs[i].data;
         }

@@ -19,9 +19,14 @@ class Lexer{
         std::size_t index;
         Diag* diag;
         LexerStatus status;
+        Location *currentLocation;
+        Token* lexIdentifier();
+        Token* lexNumber();
+        void advance();
+        void skipWhitespace(); // will skip all whitespaces except for new lines (\n)
     public:
-        Lexer(std::string data, Diag* diag);
+        Lexer(std::string data, std::string inFileName, Diag* diag);
         ~Lexer();
-        std::vector<Token> lexLine();
+        std::vector<Token*> lexLine();
 };
 }

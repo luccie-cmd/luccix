@@ -28,6 +28,8 @@ namespace luccix::assembler{
             std::string data;
         public:
             Token(TokenType type, std::string data);
+            TokenType getType();
+            std::string getData();
             ~Token();
     };
 }
