@@ -52,9 +52,8 @@ namespace luccix::assembler{
 
                 default: {
                     this->diag->print(this->currentLocation, DiagLevel::Error, "Stray `%c` in program\n", this->c);
-                    this->advance();
-                    // this->status = LexerStatus::Error;
-                    // this->diag->printTrace();
+                    this->status = LexerStatus::Error;
+                    this->diag->printTrace();
                 } break;
             }
             if(this->c == '\n'){
