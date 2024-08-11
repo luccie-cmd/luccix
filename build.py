@@ -49,7 +49,7 @@ ANSI_STYLE_UNDERLINE = "\x1b[4m"
 
 CONFIG = {
     "CFLAGS": ["-std=c11"],
-    "CXXFLAGS": ["-std=c++20", 'fno-rtti', '-fno-exceptions'],
+    "CXXFLAGS": ["-std=c++20", '-fno-exceptions'],
     "CCXXFLAGS": ["-Wall", '-Wextra', "-Werror", "-fmax-errors=1"]
 }
 
@@ -101,7 +101,7 @@ def buildCXX(compiler, file, out_file, extra_args: list[str]):
     print(f"CXX   {file}")
     options = extra_args.copy()
     options.append("-c")
-    options += CONFIG.get("CFLAGS")
+    options += CONFIG.get("CXXFLAGS")
     options += CONFIG.get("CCXXFLAGS")
     options.append("-o")
     options.append(out_file+'.o')

@@ -1,25 +1,30 @@
 #pragma once
-#include <stdarg.h>
-#include "util.h"
+#include <cstdarg>
+#include <string>
+#include <stack>
 
-typedef enum luccix_diagnostic_level {
-    DIAG_LEVEL_INVALID,
-    DIAG_LEVEL_NOTE,
-    DIAG_LEVEL_WARNING,
-    DIAG_LEVEL_ERROR,
-    DIAG_LEVEL_ICE,
-} luccix_diagnostic_level;
+namespace luccix::assembler{
+enum struct DiagLevel : int {
+    Invalid,
+    Note,
+    Warning,
+    Error,
+    Ice,
+};
 
-typedef struct luccix_diagnostic{
-    int useColor;
-    int verbose;
-    util_da(const char*) stackTraceList;
-    void (*vprint)(struct luccix_diagnostic* this, const char* fmt, va_list args);
-    void (*printVerbose)(struct luccix_diagnostic* this, const char* fmt, ...);
-    void (*print)(struct luccix_diagnostic* this, luccix_diagnostic_level level, const char* fmt, ...);
-    void (*addTrace)(struct luccix_diagnostic* this, const char* functionName);
-    void (*popTrace)(struct luccix_diagnostic* this);
-    void (*printTrace)(struct luccix_diagnostic* this);
-} luccix_diagnostic;
-
-luccix_diagnostic* diagnostic_from_args(int useColor, int verbose);
+class Diag{
+    private:
+        bool colors;
+        bool verbose;
+        std::stack<std::string> stackTrace;
+    public:
+        Diag(bool useColors, bool isVerbose);
+        ~Diag();
+        void vprint(const char* fmt, va_list args);
+        void printVerbose(const char* fmt, ...);
+        void print(DiagLevel level, const char* fmt, ...);
+        void addTrace(std::string functionName);
+        void popTrace();
+        void printTrace();
+};
+}

@@ -1,16 +1,17 @@
 #pragma once
+#include <string>
 #include "lexer.h"
-#include "parser.h"
 #include "args.h"
 #include "diag.h"
 
-typedef struct luccix_assembler_context{
-    const char* inputFile;
-    const char* outputFile;
-    luccix_assembler_lexer* lexer;
-    luccix_assembler_parser* parser;
-    luccix_diagnostic* diag;
-} luccix_assembler_context;
-
-luccix_assembler_context* context_from_args(luccix_assembler_args* args);
-void context_destroy(luccix_assembler_context* context);
+namespace luccix::assembler{
+class Context{
+    private:
+        std::string outputFile;
+        Lexer* lexer;
+        Diag* diag;
+    public:
+        Context(std::string inData, std::string outDir, bool verbose, bool useColors);
+        ~Context();
+};
+}

@@ -18,3 +18,19 @@ Return types can be:
 OUTPUT FORMAT
 The output format of the compiler will be either; the AST in textual form; the IR in text form, the raw intel assembly or an Orion executable.
 these formats can be outputted all at the same time, the file where to output them is depended on the flag (so --ast <file> will output the AST to <file>)
+
+OUTPUT ABI FOR FUNCTION NAMES AND VARIABLES
+The name of the namespace will be added to [NAME] with a exlamation mark after it so if the method is for example `hello` in namespace `test` with the return type of `int` it'll produce `f:int?test!hello?`
+FUNC [NAME](<ARGS>): [RETURN TYPE] = f:[TYPE]?[NAME]?(<ARG TYPES>)
+VAR [NAME]: [ARG TYPE] = v:[ARG TYPE]?[NAME]?
+
+EXAMPLE
+namespace luccix {
+    func external hello(): void;
+}
+func main(args: std::Array<std::string>): int {
+    luccix::hello?();
+    for(arg: std::string in args){
+        println?("Hello `{}`\n", arg);
+    }
+}
