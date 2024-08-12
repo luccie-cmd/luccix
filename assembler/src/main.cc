@@ -14,7 +14,16 @@ using options = clopts<
 #endif
 
 #include <context.h>
+#include <csignal>
 using namespace luccix::assembler;
+
+Context* context = nullptr;
+
+void sigsegvHandler(int code){
+    context->diag->print(DiagLevel::Ice, "Sigsegv %d\n", code);
+    context->diag->printTrace();
+    std::exit(1);
+}
 
 int main(int argc, char** argv){
     std::string file_contents, file_path, out_file;
@@ -28,9 +37,10 @@ int main(int argc, char** argv){
     std::string colorOpt = opts.get_or<"--color">("always");
     useColors = colorOpt == "always";
 #endif
-    Context* context = new Context(file_contents, file_path, out_file, verbose, useColors);
-    SyntaxNode* node = context->parser->parseLine();
-    while(node != nullptr){
+    context = new Context(file_contents, file_path, out_file, verbose, useColors);
+    signal(SIGSEGV, sigsegvHandler);
+    SyntaxTree* tree = context->parser->parseTree();
+    for(SyntaxNode* node : tree->getNodes()){
         std::printf("Node type = %d\n", (int)node->getType());
         if(node->getType() == SyntaxNodeType::LabelDecl){
             auto decl = static_cast<SyntaxNodeLabelDecl*>(node);
@@ -38,10 +48,12 @@ int main(int argc, char** argv){
         } else if(node->getType() == SyntaxNodeType::Label){
             auto label = static_cast<SyntaxNodeLabel*>(node);
             std::printf("Token name = `%s`\n", label->getName()->getData().c_str());   
+        } else if(node->getType() == SyntaxNodeType::Inst){
+            auto inst = static_cast<SyntaxNodeInst*>(node);
+            std::printf("Inst type = %d\n", (int)inst->getInstType());
         }
-        node = context->parser->parseLine();
     }
-    delete node;
+    delete tree;
     delete context;
     return 0;
 }

@@ -62,33 +62,76 @@ namespace luccix::assembler{
         this->diag->popTrace();
         return new SyntaxNodeLabel(nameToken);
     }
-    SyntaxNode* Parser::parseLine(){
+    SyntaxNode* Parser::parseInst(){
         this->diag->addTrace(__PRETTY_FUNCTION__);
-        this->lineTokens = this->lexer->lexLine();
-        this->idx = 0;
-        (void)this->consume(); // will always be a nullptr
+        Token* instToken = this->consume();
+        std::vector<SyntaxNode*> args;
+        while(this->currentToken->getType() != TokenType::Eol){
+            args.push_back(this->parseNode());
+            if(this->currentToken->getType() != TokenType::Eol){
+                this->tryConsume(TokenType::Comma, "','");
+            }
+        }
+        this->tryConsume(TokenType::Eol, "'Newline'");
+        this->diag->popTrace();
+        return new SyntaxNodeInst(instToken, args);
+    }
+    SyntaxNode* Parser::parseNameref(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
+        Token* namerefToken = this->consume();
+        this->diag->popTrace();
+        return new SyntaxNodeNameref(namerefToken);
+    }
+    SyntaxNode* Parser::parseNode(){
         Location* beginLoc = new Location(*this->currentToken->getLoc());
         SyntaxNode* node = nullptr;
         switch(this->currentToken->getType()){
             case TokenType::KeywordGlobal: {
                 node = this->parseLabelDecl();
             } break;
+
             case TokenType::Identifier: {
                 if(this->peekToken(0) != nullptr && this->peekToken(0)->getType() == TokenType::Colon){
                     node = this->parseLabel();
                 } else{
-                    goto Invalid;
+                    node = this->parseNameref();
                 }
             } break;
 
-            Invalid:;
+            case TokenType::InstSyscall:
+            case TokenType::InstRet:
+            case TokenType::InstMov: {
+                node = this->parseInst();
+            } break;
+
+            case TokenType::Eol: {
+                this->consume();
+                node = this->parseNode();
+            } break;
+
+            case TokenType::Eof: {
+                this->consume();
+                this->status = ParserStatus::Done;
+                return nullptr;
+            } break;
+
             default: {
                 this->diag->print(beginLoc, DiagLevel::Error, "Invalid token\n");
                 this->diag->print(DiagLevel::Note, "current token data = `%s`\n", this->currentToken->getData().c_str());
+                this->consume();
                 this->status = ParserStatus::Error;
             } break;
         }
-        if(node == nullptr){
+        return node;
+    }
+    SyntaxNode* Parser::parseLine(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
+        this->lineTokens = this->lexer->lexLine();
+        this->idx = 0;
+        (void)this->consume(); // will always be a nullptr
+        Location* beginLoc = new Location(*this->currentToken->getLoc());
+        SyntaxNode* node = this->parseNode();
+        if(this->status != ParserStatus::Done && node == nullptr){
             this->diag->printTrace();
             this->diag->print(beginLoc, DiagLevel::Ice, "Node is or returned NULL\n");
             this->diag->print(DiagLevel::Note, "current data = `%s`\n", this->currentToken->getData().c_str());
@@ -101,5 +144,22 @@ namespace luccix::assembler{
         }
         this->diag->popTrace();
         return node;
+    }
+    SyntaxTree* Parser::parseTree(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
+        SyntaxTree* tree = new SyntaxTree;
+        while(this->status != ParserStatus::Done && this->status != ParserStatus::Error){
+            SyntaxNode* node = this->parseLine();
+            if(node == nullptr){
+                break;
+            }
+            tree->pushNode(node);
+        }
+        if(this->status == ParserStatus::Error){
+            this->diag->printTrace();
+            this->diag->print(DiagLevel::Error, "Parser error\n");
+        }
+        this->diag->popTrace();
+        return tree;
     }
 };

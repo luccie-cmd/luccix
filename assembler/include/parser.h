@@ -26,10 +26,13 @@ namespace luccix::assembler{
             Token* tryConsume(std::string data, std::string error);
             SyntaxNode* parseLabelDecl();
             SyntaxNode* parseLabel();
+            SyntaxNode* parseInst();
+            SyntaxNode* parseNameref();
+            SyntaxNode* parseNode();
         public:
             Parser(Lexer* lexer, Diag* diag);
             SyntaxNode* parseLine();
-            // Ast* parseFile();
+            SyntaxTree* parseTree();
             ~Parser();
     };
 };

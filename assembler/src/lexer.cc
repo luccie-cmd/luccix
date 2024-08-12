@@ -88,7 +88,7 @@ namespace luccix::assembler{
                 this->advance();
             }
         }
-        if(this->c == '\0' && tokens.size() > 0 && tokens.back()->getType() != TokenType::Eof){
+        if(this->c == '\0' && tokens.size() > 0){
             tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eol, "Eol"));
             tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eof, "Eof"));
             this->status = LexerStatus::Done;
@@ -129,8 +129,14 @@ namespace luccix::assembler{
         std::vector<Token*> tokens;
         for(std::size_t tokenIdx = cachedTokensIdx; tokenIdx <= this->cachedTokens.size(); ++tokenIdx){
             Token* token = this->cachedTokens.at(tokenIdx);
-            if(token->getType() == TokenType::Eol || token->getType() == TokenType::Eof){
+            if(token->getType() == TokenType::Eol){
                 tokens.push_back(new Token(token->getLoc(), TokenType::Eol, "Eol"));
+                this->diag->popTrace();
+                cachedTokensIdx = tokenIdx+1;
+                return tokens;
+            }
+            if(token->getType() == TokenType::Eof){
+                tokens.push_back(new Token(token->getLoc(), TokenType::Eof, "Eof"));
                 this->diag->popTrace();
                 cachedTokensIdx = tokenIdx+1;
                 return tokens;

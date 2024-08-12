@@ -9,10 +9,18 @@ namespace luccix::assembler{
         LabelDecl, // extern, global
         Label,
         Inst,
+        Nameref,
+        NumberLiteral,
     };
     enum struct SyntaxNodeLabelDeclType : int {
         Invalid,
         Global,
+    };
+    enum struct SyntaxNodeInstType : int {
+        Invalid,
+        Mov,
+        Syscall,
+        Ret,
     };
     class SyntaxNode {
         private:
@@ -43,6 +51,23 @@ namespace luccix::assembler{
             ~SyntaxNodeLabel() override;
             Token* getName();
     };
+    class SyntaxNodeNameref : public SyntaxNode {
+        private:
+            Token *nameref;
+        public:
+            SyntaxNodeNameref(Token* namerefToken);
+            ~SyntaxNodeNameref() override;
+    };
+    class SyntaxNodeInst : public SyntaxNode {
+        private:
+            Token* instToken;
+            SyntaxNodeInstType instType; // Should be in 1 big std::vector<std::pair<TokenType, SyntaxNodeInstType>>
+            std::vector<SyntaxNode*> arguments;
+        public:
+            SyntaxNodeInst(Token* instToken, std::vector<SyntaxNode*> args);
+            SyntaxNodeInstType getInstType();
+            ~SyntaxNodeInst() override;
+    };
     class SyntaxSymbol {
         private:
             std::size_t name;
@@ -61,5 +86,9 @@ namespace luccix::assembler{
             std::vector<SyntaxSymbol*> symbols;
             std::vector<std::string> strings;
         public:
+            SyntaxTree();
+            ~SyntaxTree();
+            void pushNode(SyntaxNode* node);
+            std::vector<SyntaxNode*> getNodes();
     };
 }
