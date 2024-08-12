@@ -29,6 +29,19 @@ int main(int argc, char** argv){
     useColors = colorOpt == "always";
 #endif
     Context* context = new Context(file_contents, file_path, out_file, verbose, useColors);
+    SyntaxNode* node = context->parser->parseLine();
+    while(node != nullptr){
+        std::printf("Node type = %d\n", (int)node->getType());
+        if(node->getType() == SyntaxNodeType::LabelDecl){
+            auto decl = static_cast<SyntaxNodeLabelDecl*>(node);
+            std::printf("Token start = `%s`\nToken name  = `%s`\n", decl->getStartKeyword()->getData().c_str(), decl->getName()->getData().c_str());
+        } else if(node->getType() == SyntaxNodeType::Label){
+            auto label = static_cast<SyntaxNodeLabel*>(node);
+            std::printf("Token name = `%s`\n", label->getName()->getData().c_str());   
+        }
+        node = context->parser->parseLine();
+    }
+    delete node;
     delete context;
     return 0;
 }

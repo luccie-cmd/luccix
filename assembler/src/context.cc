@@ -11,9 +11,11 @@ namespace luccix::assembler{
         this->outputFile = outFile;
         this->diag = new Diag(useColors, verbose);
         this->lexer = new Lexer(inFileData, inFileName, this->diag);
+        this->parser = new Parser(this->lexer, this->diag);
         printArgs(this->diag, inFileName, outFile, verbose, useColors);
     }
     Context::~Context(){
+        delete parser;
         delete lexer;
         delete diag;
     }

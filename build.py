@@ -49,7 +49,7 @@ ANSI_STYLE_UNDERLINE = "\x1b[4m"
 
 CONFIG = {
     "CFLAGS": ["-std=c11"],
-    "CXXFLAGS": ["-std=c++20", '-fno-exceptions'],
+    "CXXFLAGS": ["-std=c++20"],
     "CCXXFLAGS": ["-Wall", '-Wextra', "-Werror", "-fmax-errors=1", "-DCOMPILE"]
 }
 

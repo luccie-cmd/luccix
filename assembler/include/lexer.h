@@ -24,7 +24,7 @@ class Lexer{
         Token* lexIdentifier();
         Token* lexNumber();
         void advance();
-        void skipWhitespace(); // will skip all whitespaces except for new lines (\n)
+        void skipWhitespace(bool skipNewline);
         std::vector<Token*> lex();
     public:
         Lexer(std::string data, std::string inFileName, Diag* diag);
