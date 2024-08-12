@@ -34,8 +34,6 @@ int main(int argc, char** argv){
     for(Token* token : tokens){
         context->diag->print(token->getLoc(), DiagLevel::Note, "Token data = `%s` Token type = `%s`\n", token->getData().c_str(), tokenTypeToString(token->getType()).c_str());
     }
-    // util_da_free(args->inputFiles);
-    // free(args);
     delete context;
     return 0;
 }
