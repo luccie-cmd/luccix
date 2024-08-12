@@ -6,7 +6,7 @@ namespace luccix::assembler{
         this->data = inData;
         this->index = 0;
         this->status = LexerStatus::Progress;
-        this->currentLocation = new Location(inFileName, 1, 1);
+        this->currentLocation = new Location(inFileName, 0, 1);
         this->advance();
     }
     Lexer::~Lexer(){
@@ -17,21 +17,29 @@ namespace luccix::assembler{
         if(this->index >= this->data.size()){
             this->c = '\0';
         } else{
-            this->currentLocation->update(this->c == '\n' ? 0 : this->currentLocation->getColl() + 1, this->c == '\n' ? this->currentLocation->getRow() + 1 : this->currentLocation->getRow());
+            this->currentLocation->update(this->c == '\n' ? 1 : this->currentLocation->getColl() + 1, this->c == '\n' ? this->currentLocation->getRow() + 1 : this->currentLocation->getRow());
             this->c = this->data[this->index++];
         }
         this->diag->popTrace();
     }
     void Lexer::skipWhitespace(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
         while(isspace(this->c) && this->c != '\0'){
             this->advance();
         }
+        this->diag->popTrace();
     }
-    std::vector<Token*> Lexer::lexLine(){
+    std::vector<Token*> Lexer::lex(){
         this->diag->addTrace(__PRETTY_FUNCTION__);
         std::vector<Token*> tokens;
         while(this->c != '\0' && this->status != LexerStatus::Error){
             this->skipWhitespace();
+            while(this->c == ';'){
+                while(this->c != '\0' && this->c != '\n'){
+                    this->advance();
+                }
+                this->skipWhitespace();
+            }
             switch(this->c){
                 // Valid identifier start, identifier will stop after a space
                 case 'a': case 'b': case 'c': case 'd': case 'e':
@@ -46,8 +54,14 @@ namespace luccix::assembler{
                 case 'P': case 'Q': case 'R': case 'S': case 'T':
                 case 'U': case 'V': case 'W': case 'X': case 'Y':
                 case 'Z':
-                case '_': {
+                case '_': case '.': {
                     tokens.push_back(this->lexIdentifier());
+                } break;
+
+                case ':':
+                case ',': {
+                    tokens.push_back(new Token(new Location(*this->currentLocation), (TokenType)this->c, std::string(1, this->c)));
+                    this->advance();
                 } break;
 
                 default: {
@@ -57,24 +71,27 @@ namespace luccix::assembler{
                 } break;
             }
             if(this->c == '\n'){
-                tokens.push_back(new Token(TokenType::Eol, "Eol"));
+                tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eol, "Eol"));
                 this->advance();
             }
         }
         if(this->c == '\0' && tokens.size() > 0 && tokens.back()->getType() != TokenType::Eof){
-            tokens.push_back(new Token(TokenType::Eof, "Eof"));
+            tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eof, "Eof"));
         }
         this->diag->popTrace();
         return tokens;
     }
 
     Token* Lexer::lexIdentifier(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
+        Location* loc = new Location(*this->currentLocation);
         std::string data(1, this->c);
         this->advance();
-        while(!isspace(this->c) && this->c != '\0'){
+        while((isalnum(this->c) || this->c == '.' || this->c == '_') && this->c != '\0' && !isspace(this->c)){
             data.push_back(this->c);
             this->advance();
         }
-        return new Token(TokenType::Identifier, data);
+        this->diag->popTrace();
+        return new Token(loc, TokenType::Identifier, data);
     }
 }

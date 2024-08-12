@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "diag.h"
 
 namespace luccix::assembler{
     enum struct TokenType : int {
@@ -26,10 +27,12 @@ namespace luccix::assembler{
         private:
             TokenType type;
             std::string data;
+            Location* loc;
         public:
-            Token(TokenType type, std::string data);
+            Token(Location* loc, TokenType type, std::string data);
             TokenType getType();
             std::string getData();
+            Location* getLoc();
             ~Token();
     };
 }

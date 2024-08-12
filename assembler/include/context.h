@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include "lexer.h"
-#include "args.h"
 #include "diag.h"
 
 namespace luccix::assembler{

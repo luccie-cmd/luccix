@@ -27,6 +27,6 @@ class Lexer{
     public:
         Lexer(std::string data, std::string inFileName, Diag* diag);
         ~Lexer();
-        std::vector<Token*> lexLine();
+        std::vector<Token*> lex();
 };
 }
