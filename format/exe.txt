@@ -1,5 +1,5 @@
 Output format for the assembler and linker
-Header total 24/32 bytes
+Header total 32 bytes
 4 Identification bytes which must be:
     0x04 0x4F 0x52 0x49
 1 Type byte
@@ -12,13 +12,9 @@ Header total 24/32 bytes
 1 Arch byte
     Possible values
         0 = INVALID
-        1 = x86
         2 = x64
-if two values are provided the first one is for 32
-bits
-the second one is for 64 bits
-4/8 Entry bytes
-4/8 Section offset bytes
+8 Entry bytes
+8 Section offset bytes
 4 Flag bytes
     Possible values
         0 = NO FLAGS
@@ -26,15 +22,16 @@ the second one is for 64 bits
 1 Section size byte
 2 Section number bytes
 2 Name section bytes
-Section header total 24/32 bytes
+Section header total 40 bytes
 1 Type byte
     Possible values
         0 = INVALID
         1 = NAME SECTION
         2 = STRING SECTION
-4/8 Virtual addr bytes
-4/8 Memory size bytes
+8 Virtual addr bytes
+8 Memory size bytes
 8 File size bytes
+8 String table index bytes
 4 Offset in file size bytes
 1 Flags byte
     Possible values
@@ -43,3 +40,9 @@ Section header total 24/32 bytes
         2 = EXECUTE
         4 = WRITE
 2 Allignment bytes
+Symbol Entry 26 bytes total
+8 String table name index bytes
+8 Value bytes
+8 Size bytes
+1 Info byte
+1 Other info byte
