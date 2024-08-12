@@ -120,7 +120,7 @@ namespace luccix::assembler{
             this->advance();
         }
         this->diag->popTrace();
-        return new Token(loc, TokenType::Identifier, data);
+        return new Token(loc, TokenType::LiteralNumber, data);
     }
 
     static std::size_t cachedTokensIdx = 0;
