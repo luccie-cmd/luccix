@@ -153,7 +153,7 @@ def buildDir(directory_path: str, out_path: str, extra_args: list[str]=[]) -> in
             continue
         if not checkExtension(file, ["asm", "c", "lx", "cc", "cpp"]):
             continue
-        code, _ = callCmd(toCommand("cpp", extra_args+['-o', './tmp.txt', file]))
+        code, _ = callCmd(toCommand("cpp", extra_args+['-o', './tmp.txt', file, '-DCOMPILE']))
         if code != 0:
             print(f"Failed to pre process {file}")
             exit(1)

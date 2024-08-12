@@ -1419,7 +1419,7 @@ struct flag : option<_name, _description, bool, false> {};
 
 /// The help option.
 template <auto _help_cb = detail::default_help_handler>
-struct help : func<"--help", "Print this help information", [] {}> {
+struct help : func<"-h", "Print this help information", [] {}> {
     static constexpr decltype(_help_cb) help_callback = _help_cb;
     static constexpr inline bool is_help_option = true;
 };
