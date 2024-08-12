@@ -58,6 +58,11 @@ namespace luccix::assembler{
                     tokens.push_back(this->lexIdentifier());
                 } break;
 
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9': {
+                    tokens.push_back(this->lexNumber());
+                } break;
+
                 case ':':
                 case ',': {
                     tokens.push_back(new Token(new Location(*this->currentLocation), (TokenType)this->c, std::string(1, this->c)));
@@ -88,6 +93,19 @@ namespace luccix::assembler{
         std::string data(1, this->c);
         this->advance();
         while((isalnum(this->c) || this->c == '.' || this->c == '_') && this->c != '\0' && !isspace(this->c)){
+            data.push_back(this->c);
+            this->advance();
+        }
+        this->diag->popTrace();
+        return new Token(loc, TokenType::Identifier, data);
+    }
+
+    Token* Lexer::lexNumber(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
+        Location* loc = new Location(*this->currentLocation);
+        std::string data(1, this->c);
+        this->advance();
+        while((isdigit(this->c)) && this->c != '\0' && !isspace(this->c)){
             data.push_back(this->c);
             this->advance();
         }
