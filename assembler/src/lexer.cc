@@ -115,10 +115,12 @@ namespace luccix::assembler{
     }
 
     std::vector<Token*> Lexer::lexLine(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
         std::vector<Token*> tokens;
         for(Token* token : this->cachedTokens){
             if(token->getType() == TokenType::Eol || token->getType() == TokenType::Eof){
                 tokens.push_back(new Token(token->getLoc(), TokenType::Eol, "Eol"));
+                this->diag->popTrace();
                 return tokens;
             }
             tokens.push_back(token);
@@ -126,6 +128,7 @@ namespace luccix::assembler{
         this->diag->print(DiagLevel::Ice, "No EOF or EOL were in the cached tokens\n");
         this->diag->printTrace();
         this->status = LexerStatus::Error;
+        this->diag->popTrace();
         return tokens;
     }
 }
