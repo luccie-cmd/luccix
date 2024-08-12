@@ -6,6 +6,7 @@ namespace luccix::assembler{
 std::vector<std::pair<std::string, TokenType>> pairs = {
     {"global", TokenType::KeywordGlobal},
     {"mov", TokenType::InstMov},
+    {"ret", TokenType::InstRet},
     {"syscall", TokenType::InstSyscall},
 };
 

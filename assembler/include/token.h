@@ -19,6 +19,7 @@ namespace luccix::assembler{
         __INST_START=300,
         InstMov,
         InstSyscall,
+        InstRet,
     };
 
     std::string tokenTypeToString(TokenType type);
