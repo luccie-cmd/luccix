@@ -111,7 +111,7 @@ namespace luccix::assembler{
             diag->print(DiagLevel::Note, "Nameref data = `%s`\n", nameref->getToken()->getData().c_str());
         } else if(node->getType() == SyntaxNodeType::NumberLiteral){
             auto number = static_cast<SyntaxNodeLiteralNumber*>(node);
-            diag->print(DiagLevel::Note, "Number data = `%.8lx`\n", std::atoll(number->getToken()->getData().c_str()));
+            diag->print(DiagLevel::Note, "Number data = `%lx`\n", std::atoll(number->getToken()->getData().c_str()));
         }
     }
     void SyntaxTree::print(Diag* diag){
