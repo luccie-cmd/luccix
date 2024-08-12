@@ -94,24 +94,24 @@ namespace luccix::assembler{
     static void printNode(SyntaxNode* node, Diag* diag){
         if(node->getType() == SyntaxNodeType::LabelDecl){
             auto decl = static_cast<SyntaxNodeLabelDecl*>(node);
-            diag->print(DiagLevel::Note, "Token start = `%s`\nNote: Token name  = `%s`\n", decl->getStartKeyword()->getData().c_str(), decl->getName()->getData().c_str());
+            diag->printVerbose("Token start = `%s`\nToken name  = `%s`\n", decl->getStartKeyword()->getData().c_str(), decl->getName()->getData().c_str());
         } else if(node->getType() == SyntaxNodeType::Label){
             auto label = static_cast<SyntaxNodeLabel*>(node);
-            diag->print(DiagLevel::Note, "Token name  = `%s`\n", label->getName()->getData().c_str());
+            diag->printVerbose("Token name  = `%s`\n", label->getName()->getData().c_str());
         } else if(node->getType() == SyntaxNodeType::Inst){
             auto inst = static_cast<SyntaxNodeInst*>(node);
-            diag->print(DiagLevel::Note, "Inst type = %d\n", (int)inst->getInstType());
-            diag->print(DiagLevel::Note, "Children:\n");
+            diag->printVerbose("Inst type = %d\n", (int)inst->getInstType());
+            diag->printVerbose("Children:\n");
             for(SyntaxNode* childNode : inst->getArguments()){
                 printNode(childNode, diag);
             }
-            diag->print(DiagLevel::Note, "Children end\n");
+            diag->printVerbose("Children end\n");
         } else if(node->getType() == SyntaxNodeType::Nameref){
             auto nameref = static_cast<SyntaxNodeNameref*>(node);
-            diag->print(DiagLevel::Note, "Nameref data = `%s`\n", nameref->getToken()->getData().c_str());
+            diag->printVerbose("Nameref data = `%s`\n", nameref->getToken()->getData().c_str());
         } else if(node->getType() == SyntaxNodeType::NumberLiteral){
             auto number = static_cast<SyntaxNodeLiteralNumber*>(node);
-            diag->print(DiagLevel::Note, "Number data = `%lx`\n", std::atoll(number->getToken()->getData().c_str()));
+            diag->printVerbose("Number data  = `%lx`\n", std::atoll(number->getToken()->getData().c_str()));
         }
     }
     void SyntaxTree::print(Diag* diag){
