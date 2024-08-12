@@ -30,7 +30,7 @@ int main(int argc, char** argv){
 #endif
     Context* context = new Context(file_contents, file_path, out_file, verbose, useColors);
     Lexer* lexer = context->lexer;
-    std::vector<Token*> tokens = lexer->lex();
+    std::vector<Token*> tokens = lexer->lexLine();
     for(Token* token : tokens){
         context->diag->print(token->getLoc(), DiagLevel::Note, "Token data = `%s` Token type = `%s`\n", token->getData().c_str(), tokenTypeToString(token->getType()).c_str());
     }

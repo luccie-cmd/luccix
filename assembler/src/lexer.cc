@@ -8,6 +8,7 @@ namespace luccix::assembler{
         this->status = LexerStatus::Progress;
         this->currentLocation = new Location(inFileName, 0, 1);
         this->advance();
+        this->cachedTokens = this->lex();
     }
     Lexer::~Lexer(){
         this->status = LexerStatus::Invalid;
@@ -111,5 +112,20 @@ namespace luccix::assembler{
         }
         this->diag->popTrace();
         return new Token(loc, TokenType::Identifier, data);
+    }
+
+    std::vector<Token*> Lexer::lexLine(){
+        std::vector<Token*> tokens;
+        for(Token* token : this->cachedTokens){
+            if(token->getType() == TokenType::Eol || token->getType() == TokenType::Eof){
+                tokens.push_back(new Token(token->getLoc(), TokenType::Eol, "Eol"));
+                return tokens;
+            }
+            tokens.push_back(token);
+        }
+        this->diag->print(DiagLevel::Ice, "No EOF or EOL were in the cached tokens\n");
+        this->diag->printTrace();
+        this->status = LexerStatus::Error;
+        return tokens;
     }
 }

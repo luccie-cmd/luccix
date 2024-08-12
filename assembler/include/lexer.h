@@ -20,13 +20,15 @@ class Lexer{
         Diag* diag;
         LexerStatus status;
         Location *currentLocation;
+        std::vector<Token*> cachedTokens;
         Token* lexIdentifier();
         Token* lexNumber();
         void advance();
         void skipWhitespace(); // will skip all whitespaces except for new lines (\n)
+        std::vector<Token*> lex();
     public:
         Lexer(std::string data, std::string inFileName, Diag* diag);
         ~Lexer();
-        std::vector<Token*> lex();
+        std::vector<Token*> lexLine();
 };
 }
