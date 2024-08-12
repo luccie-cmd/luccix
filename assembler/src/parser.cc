@@ -82,6 +82,12 @@ namespace luccix::assembler{
         this->diag->popTrace();
         return new SyntaxNodeNameref(namerefToken);
     }
+    SyntaxNode* Parser::parseLiteralNumber(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
+        Token* numberToken = this->consume();
+        this->diag->popTrace();
+        return new SyntaxNodeLiteralNumber(numberToken);
+    }
     SyntaxNode* Parser::parseNode(){
         Location* beginLoc = new Location(*this->currentToken->getLoc());
         SyntaxNode* node = nullptr;
@@ -96,6 +102,10 @@ namespace luccix::assembler{
                 } else{
                     node = this->parseNameref();
                 }
+            } break;
+
+            case TokenType::LiteralNumber: {
+                node = this->parseLiteralNumber();
             } break;
 
             case TokenType::InstSyscall:

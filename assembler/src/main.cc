@@ -40,19 +40,7 @@ int main(int argc, char** argv){
     context = new Context(file_contents, file_path, out_file, verbose, useColors);
     signal(SIGSEGV, sigsegvHandler);
     SyntaxTree* tree = context->parser->parseTree();
-    for(SyntaxNode* node : tree->getNodes()){
-        std::printf("Node type = %d\n", (int)node->getType());
-        if(node->getType() == SyntaxNodeType::LabelDecl){
-            auto decl = static_cast<SyntaxNodeLabelDecl*>(node);
-            std::printf("Token start = `%s`\nToken name  = `%s`\n", decl->getStartKeyword()->getData().c_str(), decl->getName()->getData().c_str());
-        } else if(node->getType() == SyntaxNodeType::Label){
-            auto label = static_cast<SyntaxNodeLabel*>(node);
-            std::printf("Token name = `%s`\n", label->getName()->getData().c_str());   
-        } else if(node->getType() == SyntaxNodeType::Inst){
-            auto inst = static_cast<SyntaxNodeInst*>(node);
-            std::printf("Inst type = %d\n", (int)inst->getInstType());
-        }
-    }
+    tree->print(context->diag);
     delete tree;
     delete context;
     return 0;

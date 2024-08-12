@@ -57,6 +57,15 @@ namespace luccix::assembler{
         public:
             SyntaxNodeNameref(Token* namerefToken);
             ~SyntaxNodeNameref() override;
+            Token* getToken();
+    };
+    class SyntaxNodeLiteralNumber : public SyntaxNode {
+        private:
+            Token *number;
+        public:
+            SyntaxNodeLiteralNumber(Token* numberToken);
+            ~SyntaxNodeLiteralNumber() override;
+            Token* getToken();
     };
     class SyntaxNodeInst : public SyntaxNode {
         private:
@@ -65,8 +74,9 @@ namespace luccix::assembler{
             std::vector<SyntaxNode*> arguments;
         public:
             SyntaxNodeInst(Token* instToken, std::vector<SyntaxNode*> args);
-            SyntaxNodeInstType getInstType();
             ~SyntaxNodeInst() override;
+            SyntaxNodeInstType getInstType();
+            std::vector<SyntaxNode*> getArguments();
     };
     class SyntaxSymbol {
         private:
@@ -88,6 +98,7 @@ namespace luccix::assembler{
         public:
             SyntaxTree();
             ~SyntaxTree();
+            void print(Diag* diag);
             void pushNode(SyntaxNode* node);
             std::vector<SyntaxNode*> getNodes();
     };
