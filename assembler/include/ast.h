@@ -50,6 +50,7 @@ namespace luccix::assembler{
             SyntaxNodeLabel(Token* name);
             ~SyntaxNodeLabel() override;
             Token* getName();
+            std::size_t getOffset();
     };
     class SyntaxNodeNameref : public SyntaxNode {
         private:

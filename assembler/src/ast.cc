@@ -83,6 +83,9 @@ namespace luccix::assembler{
     Token* SyntaxNodeLabel::getName(){
         return this->nameToken;
     }
+    std::size_t SyntaxNodeLabel::getOffset(){
+        return this->offset;
+    }
     SyntaxTree::SyntaxTree(){}
     SyntaxTree::~SyntaxTree(){}
     void SyntaxTree::pushNode(SyntaxNode* node){
@@ -98,6 +101,7 @@ namespace luccix::assembler{
         } else if(node->getType() == SyntaxNodeType::Label){
             auto label = static_cast<SyntaxNodeLabel*>(node);
             diag->printVerbose("Token name  = `%s`\n", label->getName()->getData().c_str());
+            diag->printVerbose("Label off   =  %ld\n", label->getOffset());
         } else if(node->getType() == SyntaxNodeType::Inst){
             auto inst = static_cast<SyntaxNodeInst*>(node);
             diag->printVerbose("Inst type = %d\n", (int)inst->getInstType());
