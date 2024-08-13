@@ -26,9 +26,8 @@ Section header total 40 bytes
 1 Type byte
     Possible values
         0 = INVALID
-        1 = NAME SECTION
-        2 = STRING SECTION
-        3 = SYMBOL SECTION
+        1 = STRING SECTION
+        2 = SYMBOL SECTION
 8 Virtual addr bytes
 8 Memory size bytes
 8 File size bytes
