@@ -16,9 +16,12 @@ namespace luccix::assembler{
         }
         if(this->idx >= this->lineTokens.size()){
             this->currentToken = new Token(this->currentToken->getLoc(), TokenType::Eol, "Eol");
+        } else if(this->idx >= this->lexer->getCachedTokens().size()){
+            this->currentToken = new Token(this->currentToken->getLoc(), TokenType::Eof, "Eof");
         } else{
             this->currentToken = this->lineTokens.at(this->idx++);
         }
+        // this->diag->print(retToken->getLoc(), DiagLevel::Note, "IDX = %ld, Linetokens = %ld, Total tokens = %ld\n", this->idx, this->lineTokens.size(),this->lexer->getCachedTokens().size());
         this->diag->popTrace();
         return retToken;
     }
@@ -31,7 +34,7 @@ namespace luccix::assembler{
             this->diag->printTrace();
             this->diag->print(this->currentToken != nullptr ? this->currentToken->getLoc() : this->lineTokens.at(0)->getLoc(), DiagLevel::Ice, "Expected a token, but got an end of list\n");
             this->status = ParserStatus::Error;
-            std::exit(1);
+            std::__throw_runtime_error("Parser failed");
         }
         this->diag->popTrace();
         return retToken;
@@ -40,8 +43,9 @@ namespace luccix::assembler{
         this->diag->addTrace(__PRETTY_FUNCTION__);
         Token* retToken = this->consume();
         if(retToken->getType() != type){
+            this->diag->print(retToken->getLoc(), DiagLevel::Error, "Expected %s but got `%s`\n", error.c_str(), tokenTypeToString(retToken->getType()).c_str());
+            this->diag->printVerbose("Token data = `%s`\n", retToken->getData().c_str());
             this->status = ParserStatus::Error;
-            this->diag->print(retToken->getLoc(), DiagLevel::Error, "Expected %s but got `%s`\nGotten type = `%s`\n", error.c_str(), tokenTypeToString(type).c_str(), tokenTypeToString(retToken->getType()).c_str());
         }
         this->diag->popTrace();
         return retToken;
@@ -89,6 +93,7 @@ namespace luccix::assembler{
         return new SyntaxNodeLiteralNumber(numberToken);
     }
     SyntaxNode* Parser::parseNode(){
+        this->diag->addTrace(__PRETTY_FUNCTION__);
         Location* beginLoc = new Location(*this->currentToken->getLoc());
         SyntaxNode* node = nullptr;
         switch(this->currentToken->getType()){
@@ -116,7 +121,7 @@ namespace luccix::assembler{
 
             case TokenType::Eol: {
                 this->consume();
-                node = this->parseNode();
+                node = this->parseLine();
             } break;
 
             case TokenType::Eof: {
@@ -132,6 +137,7 @@ namespace luccix::assembler{
                 this->status = ParserStatus::Error;
             } break;
         }
+        this->diag->popTrace();
         return node;
     }
     SyntaxNode* Parser::parseLine(){
@@ -150,7 +156,7 @@ namespace luccix::assembler{
                 this->diag->print(token->getLoc(), DiagLevel::Note, "data = `%s`\n", token->getData().c_str());
             }
             this->status = ParserStatus::Error;
-            std::exit(1);
+            std::__throw_runtime_error("Parser failed");
         }
         this->diag->popTrace();
         return node;
@@ -169,6 +175,7 @@ namespace luccix::assembler{
             this->diag->printTrace();
             this->diag->print(DiagLevel::Error, "Parser error\n");
         }
+        this->diag->print(DiagLevel::Note, "Parsed Tokens\n");
         this->diag->popTrace();
         return tree;
     }

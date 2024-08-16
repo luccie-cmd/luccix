@@ -25,7 +25,22 @@ void sigsegvHandler(int code){
     std::exit(1);
 }
 
+int real_main(int argc, char** argv);
+
 int main(int argc, char** argv){
+    try{
+        real_main(argc, argv);
+    } catch(std::exception& e){
+        if(context != nullptr && context->diag != nullptr){
+            context->diag->printTrace();
+            context->diag->print(DiagLevel::Ice, "Exception: `%s`\n", e.what());
+        } else{
+            std::printf("Excpetion occured: `%s`\n", e.what());
+        }
+    }
+}
+
+int real_main(int argc, char** argv){
     std::string file_contents, file_path, out_file;
     bool verbose, useColors;
 #ifdef COMPILE
@@ -37,10 +52,9 @@ int main(int argc, char** argv){
     std::string colorOpt = opts.get_or<"--color">("always");
     useColors = colorOpt == "always";
 #endif
-    context = new Context(file_contents, file_path, out_file, verbose, useColors);
     signal(SIGSEGV, sigsegvHandler);
-    SyntaxTree* tree = context->parser->parseTree();
-    tree->print(context->diag);
+    context = new Context(file_contents, file_path, out_file, verbose, useColors);
+    IrTree* tree = context->semagen->getTree();
     delete tree;
     delete context;
     return 0;

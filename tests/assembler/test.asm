@@ -5,3 +5,8 @@ _start:
     syscall
 .end:
     ret
+    
+; TODO: These fuckers
+; mov ebx, 0
+; mov ebx, [ebx]
+; mov DWORD [ebx], 0

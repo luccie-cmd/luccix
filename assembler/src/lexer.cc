@@ -15,24 +15,19 @@ namespace luccix::assembler{
     }
     void Lexer::advance(){
         this->diag->addTrace(__PRETTY_FUNCTION__);
-        if(this->index >= this->data.size()){
+        if(this->index >= this->data.size()-1){
             this->c = '\0';
         } else{
             this->currentLocation->update(this->c == '\n' ? 1 : this->currentLocation->getColl() + 1, this->c == '\n' ? this->currentLocation->getRow() + 1 : this->currentLocation->getRow());
-            this->c = this->data[this->index++];
+            this->c = this->data.at(this->index++);
         }
         this->diag->popTrace();
     }
-    void Lexer::skipWhitespace(bool skipNewline=true){
+    void Lexer::skipWhitespace(bool skipNewline){
         this->diag->addTrace(__PRETTY_FUNCTION__);
-        if(skipNewline){
-            while(isspace(this->c) && this->c != '\0' && this->c != '\n'){
-                this->advance();
-            }
-        } else{
-            while(isspace(this->c) && this->c != '\0'){
-                this->advance();
-            }
+        (void)skipNewline;
+        while(isspace(this->c) && this->c != '\0' && this->c != '\n'){
+            this->advance();
         }
         this->diag->popTrace();
     }
@@ -41,11 +36,13 @@ namespace luccix::assembler{
         std::vector<Token*> tokens;
         while(this->c != '\0' && this->status != LexerStatus::Error){
             this->skipWhitespace(false);
-            while(this->c == ';'){
-                while(this->c != '\0' && this->c != '\n'){
+            while(this->c == ';' && this->c != '\0'){
+                while(this->c != '\n' && this->c != '\0'){
                     this->advance();
                 }
-                this->skipWhitespace(false);
+                while(isspace(this->c) && this->c != '\0'){
+                    this->advance();
+                }
             }
             switch(this->c){
                 // Valid identifier start, identifier will stop after a space
@@ -76,20 +73,22 @@ namespace luccix::assembler{
                     this->advance();
                 } break;
 
+                case '\n': {
+                    tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eol, "Eol"));
+                    this->advance();
+                } break;
+
+                case '\0': {
+                    this->status = LexerStatus::Done;
+                } break;
+
                 default: {
                     this->diag->print(this->currentLocation, DiagLevel::Error, "Stray `%c` in program\n", this->c);
                     this->status = LexerStatus::Error;
-                    this->diag->printTrace();
                 } break;
             }
-            this->skipWhitespace(true);
-            if(this->c == '\n'){
-                tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eol, "Eol"));
-                this->advance();
-            }
         }
-        if(this->c == '\0' && tokens.size() > 0){
-            tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eol, "Eol"));
+        if(this->c == '\0'){
             tokens.push_back(new Token(new Location(*this->currentLocation), TokenType::Eof, "Eof"));
             this->status = LexerStatus::Done;
         }
@@ -128,25 +127,20 @@ namespace luccix::assembler{
         this->diag->addTrace(__PRETTY_FUNCTION__);
         std::vector<Token*> tokens;
         for(std::size_t tokenIdx = cachedTokensIdx; tokenIdx <= this->cachedTokens.size(); ++tokenIdx){
+            cachedTokensIdx = tokenIdx+1;
             Token* token = this->cachedTokens.at(tokenIdx);
-            if(token->getType() == TokenType::Eol){
-                tokens.push_back(new Token(token->getLoc(), TokenType::Eol, "Eol"));
-                this->diag->popTrace();
-                cachedTokensIdx = tokenIdx+1;
-                return tokens;
-            }
-            if(token->getType() == TokenType::Eof){
-                tokens.push_back(new Token(token->getLoc(), TokenType::Eof, "Eof"));
-                this->diag->popTrace();
-                cachedTokensIdx = tokenIdx+1;
-                return tokens;
-            }
             tokens.push_back(token);
+            if(token->getType() == TokenType::Eof || token->getType() == TokenType::Eol){
+                this->diag->popTrace();
+                return tokens;
+            }
         }
         this->diag->print(DiagLevel::Ice, "No EOF or EOL were in the cached tokens\n");
         this->diag->printTrace();
         this->status = LexerStatus::Error;
-        this->diag->popTrace();
-        return tokens;
+        std::__throw_runtime_error("Lexer failed");
+    }
+    std::vector<Token*> Lexer::getCachedTokens(){
+        return this->cachedTokens;
     }
 }

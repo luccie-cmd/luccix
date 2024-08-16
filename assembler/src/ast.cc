@@ -11,6 +11,9 @@ namespace luccix::assembler{
     SyntaxNodeType SyntaxNode::getType(){
         return this->type;
     }
+    Location* SyntaxNode::getLoc(){
+        return this->loc;
+    }
     SyntaxNodeLabelDecl::SyntaxNodeLabelDecl(Token* startKeyword, Token* name) :SyntaxNode(startKeyword->getLoc(), SyntaxNodeType::LabelDecl){
         this->StartKeyword = startKeyword;
         this->name = name;
@@ -39,7 +42,7 @@ namespace luccix::assembler{
     }
     SyntaxNodeLabel::SyntaxNodeLabel(Token* name) :SyntaxNode(name->getLoc(), SyntaxNodeType::Label){
         this->nameToken = name;
-        this->offset = -1; // let the semantic analyser fill this in
+        this->offset = -1; // let the semagenntic analyser fill this in
     }
     SyntaxNodeLabel::~SyntaxNodeLabel(){
         delete this->nameToken;
@@ -119,8 +122,36 @@ namespace luccix::assembler{
         }
     }
     void SyntaxTree::print(Diag* diag){
-        for(SyntaxNode* node : this->getNodes()){
+        for(SyntaxNode* node : this->nodes){
             printNode(node, diag);
         }
+    }
+    SyntaxSymbol::SyntaxSymbol(std::size_t name, std::size_t value, std::size_t symbolSize, SymbolType symbolType, SymbolBind symbolBind, std::uint8_t unused){
+        this->name = name;
+        this->value = value;
+        this->symbolSize = symbolSize;
+        this->symbolType = symbolType;
+        this->symbolBind = symbolBind;
+        this->unused = unused;
+    }
+    SyntaxSymbol::~SyntaxSymbol(){}
+
+    std::size_t SyntaxSymbol::getName(){
+        return this->name;
+    }
+    std::size_t SyntaxSymbol::getValue(){
+        return this->value;
+    }
+    std::size_t SyntaxSymbol::getSymbolSize(){
+        return this->symbolSize;
+    }
+    SymbolType SyntaxSymbol::getSymbolType(){
+        return this->symbolType;
+    }
+    SymbolBind SyntaxSymbol::getSymbolBind(){
+        return this->symbolBind;
+    }
+    std::uint8_t SyntaxSymbol::getUnused(){
+        return this->unused;
     }
 };

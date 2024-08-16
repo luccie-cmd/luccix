@@ -28,8 +28,9 @@ namespace luccix::assembler{
             SyntaxNodeType type;
         public:
             SyntaxNode(Location* loc, SyntaxNodeType type);
-            virtual ~SyntaxNode() = 0;
+            virtual ~SyntaxNode();
             SyntaxNodeType getType();
+            Location* getLoc();
     };
     class SyntaxNodeLabelDecl : public SyntaxNode {
         private:
@@ -45,6 +46,7 @@ namespace luccix::assembler{
     class SyntaxNodeLabel : public SyntaxNode {
         private:
             Token* nameToken;
+            // Relative to begining of the file
             std::size_t offset;
         public:
             SyntaxNodeLabel(Token* name);
@@ -79,27 +81,44 @@ namespace luccix::assembler{
             SyntaxNodeInstType getInstType();
             std::vector<SyntaxNode*> getArguments();
     };
+    enum struct SymbolType : int {
+        NoType,
+    };
+    enum struct SymbolBind : int {
+        Unknown,
+        Global,
+        Local,
+    };
     class SyntaxSymbol {
         private:
             std::size_t name;
             std::size_t value;
             std::size_t symbolSize;
-            std::uint8_t symbolType : 4;
-            std::uint8_t symbolBind : 4;
+            SymbolType symbolType : 4;
+            SymbolBind symbolBind : 4;
             std::uint8_t unused;
         public:
-            SyntaxSymbol(std::size_t name, std::size_t value, std::size_t symbolSize, std::uint8_t symbolType, std::uint8_t symbolBind, std::uint8_t unused);
+            SyntaxSymbol(std::size_t name, std::size_t value, std::size_t symbolSize, SymbolType symbolType, SymbolBind symbolBind, std::uint8_t unused);
             ~SyntaxSymbol();
+            std::size_t getName();
+            std::size_t getValue();
+            std::size_t getSymbolSize();
+            SymbolType getSymbolType();
+            SymbolBind getSymbolBind();
+            std::uint8_t getUnused();
     };
     class SyntaxTree{
         private:
             std::vector<SyntaxNode*> nodes;
-            std::vector<SyntaxSymbol*> symbols;
-            std::vector<std::string> strings;
         public:
             SyntaxTree();
             ~SyntaxTree();
             void print(Diag* diag);
+            std::size_t findStrIdx(std::string str);
+            bool nameInStrtab(std::string name);
+            void addString(std::string str);
+            SyntaxSymbol* getSymbolByName(std::string str);
+            void addSymbol(SyntaxSymbol* symbol);
             void pushNode(SyntaxNode* node);
             std::vector<SyntaxNode*> getNodes();
     };
