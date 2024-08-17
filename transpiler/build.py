@@ -193,8 +193,8 @@ def linkDir(directory_path: str, out_file: str, extra_args: list[str]=[]):
     # callCmd(toCommand("strip", [out_file]))
 
 def buildAndLinkDir(path: str, out_path: str, out_file: str, extra_comp_args=[], extra_link_args=[]):
-    buildDir(path, out_path+'/assembler', extra_comp_args)
-    linkDir(out_path+'/assembler/'+path, out_file, extra_link_args)
+    buildDir(path, out_path+'/transpiler', extra_comp_args)
+    linkDir(out_path+'/transpiler/'+path, out_file, extra_link_args)
     print(f"{changedFiles} Files Were changed")
     return True
 
