@@ -208,7 +208,6 @@ namespace luccix::assembler{
             this->diag->printTrace();
             this->diag->print(DiagLevel::Error, "Parser error\n");
         }
-        this->diag->print(DiagLevel::Note, "Parsed Tokens\n");
         this->diag->popTrace();
         return tree;
     }

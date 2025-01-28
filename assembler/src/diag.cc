@@ -41,7 +41,7 @@ namespace luccix::assembler{
     static std::string DiagLevelToCstr(DiagLevel level){
         switch(level){
             case DiagLevel::Note: {
-                return ANSI_COLOR_RESET;
+                return ANSI_COLOR_CYAN;
             } break;
             case DiagLevel::Warning: {
                 return ANSI_COLOR_BRIGHT_MAGENTA;
