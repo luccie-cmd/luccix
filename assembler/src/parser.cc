@@ -1,4 +1,34 @@
 #include "parser.h"
+#include <algorithm>
+#include <cstring>
+#include <expat_config.h>
+
+std::vector<luccix::assembler::RegisterInfo> possibleRegisters = {
+    {"al", luccix::assembler::RegisterType::Byte}, {"bl", luccix::assembler::RegisterType::Byte}, {"cl", luccix::assembler::RegisterType::Byte}, {"dl", luccix::assembler::RegisterType::Byte},
+    {"ah", luccix::assembler::RegisterType::Byte}, {"bh", luccix::assembler::RegisterType::Byte}, {"ch", luccix::assembler::RegisterType::Byte}, {"dh", luccix::assembler::RegisterType::Byte},
+    {"sil", luccix::assembler::RegisterType::Byte}, {"dil", luccix::assembler::RegisterType::Byte}, {"bpl", luccix::assembler::RegisterType::Byte}, {"spl", luccix::assembler::RegisterType::Byte},
+    {"r8b", luccix::assembler::RegisterType::Byte}, {"r9b", luccix::assembler::RegisterType::Byte}, {"r10b", luccix::assembler::RegisterType::Byte}, {"r11b", luccix::assembler::RegisterType::Byte},
+    {"r12b", luccix::assembler::RegisterType::Byte}, {"r13b", luccix::assembler::RegisterType::Byte}, {"r14b", luccix::assembler::RegisterType::Byte}, {"r15b", luccix::assembler::RegisterType::Byte},
+    {"ax", luccix::assembler::RegisterType::Word}, {"bx", luccix::assembler::RegisterType::Word}, {"cx", luccix::assembler::RegisterType::Word}, {"dx", luccix::assembler::RegisterType::Word},
+    {"si", luccix::assembler::RegisterType::Word}, {"di", luccix::assembler::RegisterType::Word}, {"bp", luccix::assembler::RegisterType::Word}, {"sp", luccix::assembler::RegisterType::Word},
+    {"r8w", luccix::assembler::RegisterType::Word}, {"r9w", luccix::assembler::RegisterType::Word}, {"r10w", luccix::assembler::RegisterType::Word}, {"r11w", luccix::assembler::RegisterType::Word},
+    {"r12w", luccix::assembler::RegisterType::Word}, {"r13w", luccix::assembler::RegisterType::Word}, {"r14w", luccix::assembler::RegisterType::Word}, {"r15w", luccix::assembler::RegisterType::Word},
+    {"eax", luccix::assembler::RegisterType::Dword}, {"ebx", luccix::assembler::RegisterType::Dword}, {"ecx", luccix::assembler::RegisterType::Dword}, {"edx", luccix::assembler::RegisterType::Dword},
+    {"esi", luccix::assembler::RegisterType::Dword}, {"edi", luccix::assembler::RegisterType::Dword}, {"ebp", luccix::assembler::RegisterType::Dword}, {"esp", luccix::assembler::RegisterType::Dword},
+    {"r8d", luccix::assembler::RegisterType::Dword}, {"r9d", luccix::assembler::RegisterType::Dword}, {"r10d", luccix::assembler::RegisterType::Dword}, {"r11d", luccix::assembler::RegisterType::Dword},
+    {"r12d", luccix::assembler::RegisterType::Dword}, {"r13d", luccix::assembler::RegisterType::Dword}, {"r14d", luccix::assembler::RegisterType::Dword}, {"r15d", luccix::assembler::RegisterType::Dword},
+    {"rax", luccix::assembler::RegisterType::Qword}, {"rbx", luccix::assembler::RegisterType::Qword}, {"rcx", luccix::assembler::RegisterType::Qword}, {"rdx", luccix::assembler::RegisterType::Qword},
+    {"rsi", luccix::assembler::RegisterType::Qword}, {"rdi", luccix::assembler::RegisterType::Qword}, {"rbp", luccix::assembler::RegisterType::Qword}, {"rsp", luccix::assembler::RegisterType::Qword},
+    {"r8", luccix::assembler::RegisterType::Qword}, {"r9", luccix::assembler::RegisterType::Qword}, {"r10", luccix::assembler::RegisterType::Qword}, {"r11", luccix::assembler::RegisterType::Qword},
+    {"r12", luccix::assembler::RegisterType::Qword}, {"r13", luccix::assembler::RegisterType::Qword}, {"r14", luccix::assembler::RegisterType::Qword}, {"r15", luccix::assembler::RegisterType::Qword},
+    {"xmm0", luccix::assembler::RegisterType::XMM}, {"xmm1", luccix::assembler::RegisterType::XMM}, {"xmm2", luccix::assembler::RegisterType::XMM}, {"xmm3", luccix::assembler::RegisterType::XMM},
+    {"xmm4", luccix::assembler::RegisterType::XMM}, {"xmm5", luccix::assembler::RegisterType::XMM}, {"xmm6", luccix::assembler::RegisterType::XMM}, {"xmm7", luccix::assembler::RegisterType::XMM},
+    {"ymm0", luccix::assembler::RegisterType::YMM}, {"ymm1", luccix::assembler::RegisterType::YMM}, {"ymm2", luccix::assembler::RegisterType::YMM}, {"ymm3", luccix::assembler::RegisterType::YMM},
+    {"ymm4", luccix::assembler::RegisterType::YMM}, {"ymm5", luccix::assembler::RegisterType::YMM}, {"ymm6", luccix::assembler::RegisterType::YMM}, {"ymm7", luccix::assembler::RegisterType::YMM},
+    {"zmm0", luccix::assembler::RegisterType::ZMM}, {"zmm1", luccix::assembler::RegisterType::ZMM}, {"zmm2", luccix::assembler::RegisterType::ZMM}, {"zmm3", luccix::assembler::RegisterType::ZMM},
+    {"zmm4", luccix::assembler::RegisterType::ZMM}, {"zmm5", luccix::assembler::RegisterType::ZMM}, {"zmm6", luccix::assembler::RegisterType::ZMM}, {"zmm7", luccix::assembler::RegisterType::ZMM}
+};
+
 
 namespace luccix::assembler{
     Parser::Parser(Lexer* lexer, Diag* diag){
@@ -34,7 +64,6 @@ namespace luccix::assembler{
             this->diag->printTrace();
             this->diag->print(this->currentToken != nullptr ? this->currentToken->getLoc() : this->lineTokens.at(0)->getLoc(), DiagLevel::Ice, "Expected a token, but got an end of list\n");
             this->status = ParserStatus::Error;
-            std::__throw_runtime_error("Parser failed");
         }
         this->diag->popTrace();
         return retToken;
@@ -61,6 +90,7 @@ namespace luccix::assembler{
     SyntaxNode* Parser::parseLabel(){
         this->diag->addTrace(__PRETTY_FUNCTION__);
         Token* nameToken = this->consume();
+        // TODO: Support NASM like names
         this->tryConsume(TokenType::Colon, "':'");
         this->tryConsume(TokenType::Eol, "'Newline'");
         this->diag->popTrace();
@@ -100,15 +130,19 @@ namespace luccix::assembler{
             case TokenType::KeywordGlobal: {
                 node = this->parseLabelDecl();
             } break;
-
             case TokenType::Identifier: {
                 if(this->peekToken(0) != nullptr && this->peekToken(0)->getType() == TokenType::Colon){
                     node = this->parseLabel();
+                } else if (auto it = std::find_if(possibleRegisters.begin(), possibleRegisters.end(),
+                           [this](const RegisterInfo& reg) {
+                               return std::strcmp(reg.name, this->currentToken->getData().c_str()) == 0;
+                           }); it != possibleRegisters.end()) {
+                    Token* registerToken = this->tryConsume(TokenType::Identifier, "ICE: Invalid register identifier");
+                    node = new SyntaxNodeRegister(registerToken, *it.base());
                 } else{
                     node = this->parseNameref();
                 }
             } break;
-
             case TokenType::LiteralNumber: {
                 node = this->parseLiteralNumber();
             } break;
@@ -156,7 +190,6 @@ namespace luccix::assembler{
                 this->diag->print(token->getLoc(), DiagLevel::Note, "data = `%s`\n", token->getData().c_str());
             }
             this->status = ParserStatus::Error;
-            std::__throw_runtime_error("Parser failed");
         }
         this->diag->popTrace();
         return node;

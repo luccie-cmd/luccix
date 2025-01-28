@@ -18,11 +18,11 @@ namespace luccix::assembler{
             IrTree* outTree;
             Diag* diag;
             SemaGenStatus status;
-            std::size_t instLenInBytes;
             void parseTree();
             void translateNode(SyntaxNode* node);
             void translateLabelDecl(SyntaxNodeLabelDecl* decl);
             void translateLabelToSymbol(SyntaxNodeLabel* label);
+            void translateInst(SyntaxNodeInst* inst);
         public:
             SemaGen(SyntaxTree* tree, Diag* diag);
             ~SemaGen();

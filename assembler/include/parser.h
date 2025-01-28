@@ -30,6 +30,7 @@ namespace luccix::assembler{
             SyntaxNode* parseNameref();
             SyntaxNode* parseLiteralNumber();
             SyntaxNode* parseNode();
+            SyntaxNode* parseRegister();
         public:
             Parser(Lexer* lexer, Diag* diag);
             SyntaxNode* parseLine();

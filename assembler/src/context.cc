@@ -12,10 +12,12 @@ namespace luccix::assembler{
         this->outputFile = outFile;
         this->diag = new Diag(useColors, verbose);
         assert(this->diag != nullptr);
+        printArgs(this->diag, inFileName, outFile, verbose, useColors);
         this->lexer = new Lexer(inFileData, inFileName, this->diag);
         this->parser = new Parser(this->lexer, this->diag);
-        this->semagen = new SemaGen(this->parser->parseTree(), this->diag);
-        printArgs(this->diag, inFileName, outFile, verbose, useColors);
+        SyntaxTree* tree = this->parser->parseTree();
+        this->semagen = new SemaGen(tree, this->diag);
+        diag->printVerbose("TODO: Code gen\n");
     }
     Context::~Context(){
         delete semagen                  ;

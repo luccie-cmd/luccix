@@ -55,6 +55,7 @@ int real_main(int argc, char** argv){
     signal(SIGSEGV, sigsegvHandler);
     context = new Context(file_contents, file_path, out_file, verbose, useColors);
     IrTree* tree = context->semagen->getTree();
+    tree->print(context->diag);
     delete tree;
     delete context;
     return 0;

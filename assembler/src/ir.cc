@@ -25,8 +25,14 @@ namespace luccix::assembler{
     void IrTree::addSymbol(IrNodeSymbol* sym){
         this->symbols.push_back(sym);
     }
+    void IrTree::addInst(IrNodeInst* inst){
+        this->insts.push_back(inst);
+    }
     IrNodeSymbol::IrNodeSymbol(SyntaxSymbol* sym){
         this->synSym = sym;
+    }
+    SyntaxSymbol* IrNodeSymbol::getSynSym(){
+        return this->synSym;
     }
     IrNodeSymbol::~IrNodeSymbol(){
         delete this->synSym;
@@ -36,5 +42,33 @@ namespace luccix::assembler{
     }
     std::string IrNodeString::getStr(){
         return this->str;
+    }
+    IrNodeInst::IrNodeInst(IrInstType instType, IrInstOpType operationType, std::array<IrInstOperand, 3> operands){
+        this->instType = instType;
+        this->operationType = operationType;
+        this->operands = operands;
+    }
+    IrNodeInst::~IrNodeInst(){}
+    void IrTree::printSymbols(Diag* diag){
+        for(IrNodeSymbol *symbol : this->symbols){
+            diag->printVerbose("Symbol %lu\n", symbol->getSynSym()->getName());
+        }
+    }
+    void IrTree::printStrings(Diag* diag){
+        for(size_t i = 0; i < this->strings.size(); ++i){
+            IrNodeString* string = this->strings.at(i);
+            diag->printVerbose("String %lu: %s\n", i, string->getStr().c_str());
+        }
+    }
+    void IrTree::printInsts(Diag* diag){
+        (void)diag;
+    }
+    void IrTree::print(Diag* diag){
+        diag->printVerbose("SYMBOLS:\n");
+        this->printSymbols(diag);
+        diag->printVerbose("STRINGS:\n");
+        this->printStrings(diag);
+        diag->printVerbose("INSTS:\n");
+        this->printInsts(diag);
     }
 };

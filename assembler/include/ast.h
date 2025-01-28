@@ -9,6 +9,7 @@ namespace luccix::assembler{
         LabelDecl, // extern, global
         Label,
         Inst,
+        Register,
         Nameref,
         NumberLiteral,
     };
@@ -22,6 +23,19 @@ namespace luccix::assembler{
         Syscall,
         Ret,
     };
+    enum struct RegisterType {
+        Byte,    // 8-bit registers
+        Word,    // 16-bit registers
+        Dword,   // 32-bit registers
+        Qword,   // 64-bit registers
+        XMM,     // 128-bit SSE registers
+        YMM,     // 256-bit AVX registers
+        ZMM      // 512-bit AVX-512 registers
+    };
+    struct RegisterInfo {
+        const char* name;
+        RegisterType type;
+    };
     class SyntaxNode {
         private:
             Location* loc;
@@ -31,6 +45,15 @@ namespace luccix::assembler{
             virtual ~SyntaxNode();
             SyntaxNodeType getType();
             Location* getLoc();
+    };
+    class SyntaxNodeRegister : public SyntaxNode{
+        private:
+            RegisterInfo info;
+        public:
+            SyntaxNodeRegister(Token* registerToken, RegisterInfo info);
+            SyntaxNodeRegister(Token* registerToken, const char* name, RegisterType type);
+            inline RegisterInfo getInfo(){ return this->info; }
+            ~SyntaxNodeRegister();
     };
     class SyntaxNodeLabelDecl : public SyntaxNode {
         private:

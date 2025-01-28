@@ -154,4 +154,8 @@ namespace luccix::assembler{
     std::uint8_t SyntaxSymbol::getUnused(){
         return this->unused;
     }
+    SyntaxNodeRegister::SyntaxNodeRegister(Token* registerToken, RegisterInfo info) :SyntaxNode(registerToken->getLoc(), SyntaxNodeType::Register){
+        this->info = info;
+    }
+    SyntaxNodeRegister::~SyntaxNodeRegister(){}
 };
