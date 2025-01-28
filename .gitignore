@@ -2,5 +2,3 @@ commands.txt
 tmp.*
 out/
 .vscode/
-assembler/
-linker/
