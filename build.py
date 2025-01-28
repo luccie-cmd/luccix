@@ -64,7 +64,10 @@ def main():
     if "exit" in sys.argv:
         exit(0)
     callCmd(f"mkdir -p {out_dir}")
-    os.chdir("./assembler")
+    # os.chdir("./assembler")
+    # callCmd(f"python3 build.py -o ../{out_dir}")
+    # os.chdir("../")
+    os.chdir("./transpiler")
     callCmd(f"python3 build.py -o ../{out_dir}")
     os.chdir("../")
 
