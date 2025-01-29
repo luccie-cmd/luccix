@@ -91,6 +91,9 @@ namespace luccix::assembler{
         public:
             IrNodeInst(IrInstType instType, IrInstOpType operationType, std::array<IrInstOperand, 3> operands);
             ~IrNodeInst();
+            inline IrInstType getInstType(){ return this->instType; }
+            inline IrInstOpType getOperationType(){ return this->operationType; }
+            inline std::array<IrInstOperand, 3> getOperands(){ return this->operands; }
     };
     class IrTree{
         private:
