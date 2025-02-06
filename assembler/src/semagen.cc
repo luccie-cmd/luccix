@@ -50,8 +50,8 @@ namespace luccix::assembler{
             types.at(i) = args.at(i)->getType();
         }
         if(types.at(0) == SyntaxNodeType::Register && types.at(1) == SyntaxNodeType::NumberLiteral && types.at(2) == SyntaxNodeType::Invalid){
-            auto nodeReg = reinterpret_cast<SyntaxNodeRegister*>(args.at(0));
-            auto immReg = reinterpret_cast<SyntaxNodeLiteralNumber*>(args.at(1));
+            auto nodeReg = static_cast<SyntaxNodeRegister*>(args.at(0));
+            auto immReg = static_cast<SyntaxNodeLiteralNumber*>(args.at(1));
             RegisterType regType = nodeReg->getInfo().type;
             std::uint64_t immValue = std::stoull(immReg->getToken()->getData());
             if(regType < RegisterType::Qword && immValue > UINT32_MAX){
@@ -124,6 +124,10 @@ namespace luccix::assembler{
         this->diag->addTrace(__PRETTY_FUNCTION__);
         this->outTree = new IrTree;
         for(SyntaxNode* node : this->inTree->getNodes()){
+            if(node == nullptr){
+                this->status = SemaGenStatus::Done;
+                continue;
+            }
             if(this->status == SemaGenStatus::Error){
                 return;
             }

@@ -1,4 +1,7 @@
 commands.txt
 tmp.*
-out/
+*.old
+info.txt
+__pycache__/
+bin/
 .vscode/

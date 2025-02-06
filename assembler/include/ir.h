@@ -112,5 +112,8 @@ namespace luccix::assembler{
             bool nameInStr(std::string name);
             std::size_t findStrIdx(std::string name);
             void print(Diag* diag);
+            inline std::vector<IrNodeString*> getStrings() { return this->strings; }
+            inline std::vector<IrNodeSymbol*> getSymbols() { return this->symbols; }
+            inline std::vector<IrNodeInst*> getInsts() { return this->insts; }
     };
 }

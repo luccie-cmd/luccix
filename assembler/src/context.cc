@@ -14,15 +14,21 @@ namespace luccix::assembler{
         assert(this->diag != nullptr);
         printArgs(this->diag, inFileName, outFile, verbose, useColors);
         this->lexer = new Lexer(inFileData, inFileName, this->diag);
-        this->parser = new Parser(this->lexer, this->diag);
-        SyntaxTree* tree = this->parser->parseTree();
-        this->semagen = new SemaGen(tree, this->diag);
-        diag->printVerbose("TODO: Code gen\n");
     }
     Context::~Context(){
-        delete semagen                  ;
+        delete semagen;
         delete parser;
         delete lexer;
         delete diag;
+    }
+    void Context::start(){
+        this->parser = new Parser(this->lexer, this->diag);
+        SyntaxTree* tree = this->parser->parseTree();
+        this->semagen = new SemaGen(tree, this->diag);
+        IrTree* irTree = this->semagen->getTree();
+        irTree->print(this->diag);
+        diag->printVerbose("TODO: Optimizing\n");
+        this->codeGen = new CodeGen(irTree, this->outputFile);
+        this->codeGen->doCodegen();
     }
 }

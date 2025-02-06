@@ -7,6 +7,7 @@ namespace luccix::assembler{
         this->index = 0;
         this->status = LexerStatus::Progress;
         this->currentLocation = new Location(inFileName, 0, 1);
+        this->c = 0;
         this->advance();
         this->cachedTokens = this->lex();
     }

@@ -1,5 +1,5 @@
 Output format for the assembler and linker
-Header total 32 bytes
+Header total 40 bytes
 4 Identification bytes which must be:
     0x04 0x4F 0x52 0x49
 1 Type byte
@@ -13,6 +13,7 @@ Header total 32 bytes
     Possible values
         0 = INVALID
         2 = x64
+1 Reserved byte
 8 Entry bytes
 8 Section offset bytes
 4 Flag bytes
@@ -22,12 +23,15 @@ Header total 32 bytes
 1 Section size byte
 2 Section number bytes
 2 Name section bytes
-Section header total 40 bytes
+7 Padding bytes
+Section header total 48 bytes
 1 Type byte
     Possible values
         0 = INVALID
         1 = STRING SECTION
         2 = SYMBOL SECTION
+1 Reserved byte
+2 Allignment bytes
 8 Virtual addr bytes
 8 Memory size bytes
 8 File size bytes
@@ -39,10 +43,15 @@ Section header total 40 bytes
         1 = LOAD
         2 = EXECUTE
         4 = WRITE
-2 Allignment bytes
-Symbol Entry 26 bytes total
+7 Padding bytes
+Symbol Entry 32 bytes total
 8 String table name index bytes
 8 Value bytes
 8 Size bytes
 1 Info byte
 1 Other info byte
+6 Padding bytes
+String symbol
+8 String index bytes (current index)
+8 Size bytes
+N Value bytes

@@ -57,7 +57,7 @@ namespace luccix::assembler{
     };
     class SyntaxNodeLabelDecl : public SyntaxNode {
         private:
-            SyntaxNodeLabelDeclType labelType;
+            // SyntaxNodeLabelDeclType labelType;
             Token* StartKeyword;
             Token* name;
         public:

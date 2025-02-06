@@ -92,6 +92,7 @@ namespace luccix::assembler{
     SyntaxTree::SyntaxTree(){}
     SyntaxTree::~SyntaxTree(){}
     void SyntaxTree::pushNode(SyntaxNode* node){
+        this->nodes.resize(this->nodes.size()+1);
         this->nodes.push_back(node);
     }
     std::vector<SyntaxNode*> SyntaxTree::getNodes(){
