@@ -8,23 +8,31 @@
 #include <vector>
 #include <utility>
 
+#define MEGABYTE 1024*1024
 #define GIGABYTE 1024*1024*1024
-#define GROW_RATE 4096
-#define ALIGNMENT 8
+#define PAGE_SIZE 4096
+#define GROW_RATE PAGE_SIZE
+#define ALIGNMENT 16
 static bool __initialized = false;
 static uint64_t __pmmSize = 0, __vmmMax = 0, __allocMemory = 0;
-struct Node{
+struct alignas(16) Node{
     size_t size;
     size_t allocSize;
-    bool free;
     Node* prev;
     Node* next;
+    bool free;
 };
+static_assert(alignof(Node) >= ALIGNMENT, "Node does not meet the required alignment!");
 static Node* __head = nullptr;
 static std::mutex mtx;
+template<typename T>
+T align(T size, uint64_t alignment){
+    return (size + alignment - 1) & ~(alignment - 1);
+}
+
 static void __newHead(){
     if(__head){
-        int64_t remaining = __pmmSize-__head->size;
+        int64_t remaining = align(__pmmSize-__head->size, PAGE_SIZE);
         if(remaining < 0){
             write(STDERR_FILENO, "remaining was negative\n", 23);
             std::abort();
@@ -37,6 +45,7 @@ static void __newHead(){
         newHead->next = __head;
         __head = newHead;
     } else{
+        __pmmSize = align(__pmmSize, PAGE_SIZE);
         __head = (Node*)mmap(nullptr, __pmmSize, PROT_READ | PROT_WRITE, 0x22, -1, 0);
         __head->size = __pmmSize;
         __head->allocSize = __pmmSize;
@@ -64,7 +73,7 @@ static void __mmuAtExit(){
         }
     }
     std::printf("Free blocks %lu. Used blocks %lu\n", freeBlocks, usedBlocks);
-    std::printf("Total freed %lu. Total used %lu\n", freedMemory, usedMemory);
+    std::printf("Total freed %lu. Total used %lu Still reachable bytes %lu\n", freedMemory, usedMemory, __allocMemory);
 }
 static void __CoalesceBlocks(){
     Node* current = __head;
@@ -83,7 +92,7 @@ static void __CoalesceBlocks(){
 }
 static void __initializeMallocFree(){
     __pmmSize = __allocMemory = GROW_RATE;
-    __vmmMax = GIGABYTE;
+    __vmmMax = MEGABYTE;
     __newHead();
     std::atexit(__mmuAtExit);
     __initialized = true;
@@ -94,7 +103,7 @@ void* malloc(size_t size){
     if(!__initialized){
         __initializeMallocFree();
     }
-    size_t alignedLength = (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
+    size_t alignedLength = align(size, ALIGNMENT);
     __allocMemory += alignedLength;
     bool pmmSizeChanged = false;
     while(__allocMemory >= __pmmSize){
@@ -152,6 +161,7 @@ void free(void* ptr){
         std::abort();
     }
     freeNode->free = true;
+    __allocMemory -= freeNode->size;
     __CoalesceBlocks();
     mtx.unlock();
 }
