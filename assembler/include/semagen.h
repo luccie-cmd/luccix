@@ -3,6 +3,7 @@
 #include "diag.h"
 #include "parser.h"
 #include "ir.h"
+#include <utility>
 
 namespace luccix::assembler{
     enum struct SemaGenStatus : int {
@@ -14,6 +15,7 @@ namespace luccix::assembler{
     class SemaGen{
         private:
             std::vector<SyntaxNodeLabelDecl*> globalExternNodesToHandle;
+            std::vector<std::pair<bool, SyntaxSymbol*>> tempSymbols;
             SyntaxTree* inTree;
             IrTree* outTree;
             Diag* diag;

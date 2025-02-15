@@ -15,6 +15,7 @@ namespace luccix::assembler{
         Identifier,
         LiteralNumber,
         KeywordGlobal,
+        KeywordExtern,
 
         __INST_START=300,
         InstMov,

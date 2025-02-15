@@ -25,7 +25,7 @@ namespace luccix::assembler{
         }
         this->outTree->addString(new IrNodeString(label->getName()->getData()));
         SyntaxSymbol* symbol = new SyntaxSymbol(this->outTree->findStrIdx(label->getName()->getData()), 0, 0, SymbolType::NoType, SymbolBind::Unknown, 0);
-        this->outTree->addSymbol(new IrNodeSymbol(symbol));
+        this->tempSymbols.push_back({false, symbol});
         this->diag->popTrace();
     }
     static IrRegister getRegisterFromName(Diag* diag, const char* name){
@@ -132,6 +132,31 @@ namespace luccix::assembler{
                 return;
             }
             this->translateNode(node);
+        }
+        for(SyntaxNodeLabelDecl* labelDecl : this->globalExternNodesToHandle){
+            for(std::pair<bool, SyntaxSymbol*>& symbol : this->tempSymbols){
+                if(symbol.first){
+                    continue;
+                }
+                if(symbol.second->getName() == this->outTree->findStrIdx(labelDecl->getName()->getData())){
+                    this->outTree->addSymbol(new IrNodeSymbol(new SyntaxSymbol(symbol.second->getName(), symbol.second->getValue(), symbol.second->getSymbolSize(), symbol.second->getSymbolType(), SymbolBind::Global, symbol.second->getUnused())));
+                    symbol.first = true;
+                    break;
+                } else{
+                    if(labelDecl->getLabelType() == SyntaxNodeLabelDeclType::Global){
+                        this->diag->print(labelDecl->getLoc(), DiagLevel::Error, "Unable to find label %s to make it global\n", labelDecl->getName()->getData().c_str());
+                        std::exit(1);
+                    } else{
+                        this->diag->print(labelDecl->getLoc(), DiagLevel::Ice, "TODO Handle label decleration (probs extern)\n");
+                        std::exit(1);
+                    }
+                }
+            }
+        }
+        for(std::pair<bool, SyntaxSymbol*> symbol : this->tempSymbols){
+            if(!symbol.first){
+                this->outTree->addSymbol(new IrNodeSymbol(symbol.second));
+            }
         }
         this->diag->popTrace();
     }

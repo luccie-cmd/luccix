@@ -20,9 +20,10 @@ using namespace luccix::assembler;
 Context* context = nullptr;
 
 void sigsegvHandler(int code){
-    context->diag->print(DiagLevel::Ice, "Sigsegv %d\n", code);
+    write(STDERR_FILENO, "Signal segfault\n", 16);
     context->diag->printTrace();
-    std::exit(1);
+    std::abort();
+    context->diag->print(DiagLevel::Ice, "Sigsegv %d\n", code);
 }
 
 int real_main(int argc, char** argv);

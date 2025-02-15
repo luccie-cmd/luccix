@@ -16,6 +16,7 @@ namespace luccix::assembler{
     enum struct SyntaxNodeLabelDeclType : int {
         Invalid,
         Global,
+        Extern,
     };
     enum struct SyntaxNodeInstType : int {
         Invalid,
@@ -57,12 +58,13 @@ namespace luccix::assembler{
     };
     class SyntaxNodeLabelDecl : public SyntaxNode {
         private:
-            // SyntaxNodeLabelDeclType labelType;
+            SyntaxNodeLabelDeclType labelType;
             Token* StartKeyword;
             Token* name;
         public:
             SyntaxNodeLabelDecl(Token* startKeyword, Token* name);
             ~SyntaxNodeLabelDecl() override;
+            inline SyntaxNodeLabelDeclType getLabelType() { return this->labelType; }
             Token* getStartKeyword();
             Token* getName();
     };
@@ -123,12 +125,20 @@ namespace luccix::assembler{
         public:
             SyntaxSymbol(std::size_t name, std::size_t value, std::size_t symbolSize, SymbolType symbolType, SymbolBind symbolBind, std::uint8_t unused);
             ~SyntaxSymbol();
-            std::size_t getName();
-            std::size_t getValue();
-            std::size_t getSymbolSize();
-            SymbolType getSymbolType();
-            SymbolBind getSymbolBind();
-            std::uint8_t getUnused();
+            std::size_t getName() const;
+            std::size_t getValue() const;
+            std::size_t getSymbolSize() const;
+            SymbolType getSymbolType() const;
+            SymbolBind getSymbolBind() const;
+            std::uint8_t getUnused() const;
+            bool operator==(SyntaxSymbol* other);
+            bool operator==(SyntaxSymbol& other);
+            bool operator==(SyntaxSymbol*& other);
+            bool operator==(SyntaxSymbol&& other);
+            bool operator==(const SyntaxSymbol* other) const;
+            bool operator==(const SyntaxSymbol& other) const;
+            bool operator==(const SyntaxSymbol*& other) const;
+            bool operator==(const SyntaxSymbol&& other) const;
     };
     class SyntaxTree{
         private:

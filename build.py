@@ -55,6 +55,7 @@ OLD_CONFIG = readConfig("./script/config.py.old")
 ALLOWED_CONFIG = [
     ["config", ["release", "debug"], True],
     ["compiler", ["gcc", "clang"], True],
+    ["asan", ["yes", "no"], True],
     ["outDir", [], True],
 ]
 if not checkConfig(CONFIG, ALLOWED_CONFIG):
@@ -106,6 +107,11 @@ if "debug" in CONFIG.get("config"):
     CONFIG["CFLAGS"] += ["-g"]
 else:
     CONFIG["LDFLAGS"] += ["-O3"]
+
+if "yes" in CONFIG.get("asan"):
+    CONFIG["LDFLAGS"] += ["-fsanitize=address"]
+    CONFIG["CFLAGS"] += ["-fsanitize=address"]
+
 
 def callCmd(command, print_out=False):
     with open("commands.txt", "a") as f:

@@ -54,27 +54,6 @@ static void __newHead(){
         __head->next = nullptr;
     }
 }
-static void __mmuAtExit(){
-    Node* current = __head;
-    std::vector<std::pair<uint64_t, bool>> blocks;
-    while(current){
-        blocks.push_back({current->size, current->free});
-        current = current->next;
-    }
-    uint64_t freeBlocks = 0, usedBlocks = 0;
-    uint64_t freedMemory = 0, usedMemory = 0;
-    for(std::pair<uint64_t, bool> block : blocks){
-        if(block.second){
-            freeBlocks++;
-            freedMemory+=block.first;
-        } else{
-            usedBlocks++;
-            usedMemory+=block.first;
-        }
-    }
-    std::printf("Free blocks %lu. Used blocks %lu\n", freeBlocks, usedBlocks);
-    std::printf("Total freed %lu. Total used %lu Still reachable bytes %lu\n", freedMemory, usedMemory, __allocMemory);
-}
 static void __CoalesceBlocks(){
     Node* current = __head;
     while (current && current->next){
@@ -94,7 +73,6 @@ static void __initializeMallocFree(){
     __pmmSize = __allocMemory = GROW_RATE;
     __vmmMax = MEGABYTE;
     __newHead();
-    std::atexit(__mmuAtExit);
     __initialized = true;
 }
 
@@ -152,12 +130,12 @@ void free(void* ptr){
         current = current->next;
     }
     if(!found){
-        std::printf("Tried freeing a Node that was allocated elsewhere (ptr: %p ptr2: 0x%lx head: %p)\n", ptr, (uint64_t)ptr-sizeof(Node), __head);
+        write(STDERR_FILENO, "Node not found\n", 15);
         std::abort();
     }
     Node* freeNode = reinterpret_cast<Node*>((uintptr_t)ptr-sizeof(Node));
     if(freeNode->free){
-        std::printf("Double free\n");
+        write(STDERR_FILENO, "Double free\n", 12);
         std::abort();
     }
     freeNode->free = true;

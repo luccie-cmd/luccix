@@ -23,6 +23,12 @@ namespace luccix::assembler{
         return -1;
     }
     void IrTree::addSymbol(IrNodeSymbol* sym){
+        for(IrNodeSymbol* symbol : this->symbols){
+            if(*symbol->getSynSym() == *sym->getSynSym()){
+                std::printf("ERROR: IrTree sanity check failed %s\n", __PRETTY_FUNCTION__);
+                std::exit(1);
+            }
+        }
         this->symbols.push_back(sym);
     }
     void IrTree::addInst(IrNodeInst* inst){
@@ -51,7 +57,11 @@ namespace luccix::assembler{
     IrNodeInst::~IrNodeInst(){}
     void IrTree::printSymbols(Diag* diag){
         for(IrNodeSymbol *symbol : this->symbols){
-            diag->printVerbose("Symbol %lu\n", symbol->getSynSym()->getName());
+            diag->printVerbose("Symbol %lu %lu %lu %d %d\n", symbol->getSynSym()->getName(),
+                                                             symbol->getSynSym()->getValue(),
+                                                             symbol->getSynSym()->getSymbolSize(),
+                                                             symbol->getSynSym()->getSymbolType(),
+                                                             symbol->getSynSym()->getSymbolBind());
         }
     }
     void IrTree::printStrings(Diag* diag){

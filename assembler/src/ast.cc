@@ -16,6 +16,15 @@ namespace luccix::assembler{
     }
     SyntaxNodeLabelDecl::SyntaxNodeLabelDecl(Token* startKeyword, Token* name) :SyntaxNode(startKeyword->getLoc(), SyntaxNodeType::LabelDecl){
         this->StartKeyword = startKeyword;
+        if(startKeyword->getType() == TokenType::KeywordExtern){
+            this->labelType = SyntaxNodeLabelDeclType::Extern;
+        } else if(startKeyword->getType() == TokenType::KeywordGlobal){
+            this->labelType = SyntaxNodeLabelDeclType::Global;
+        } else{
+            startKeyword->getLoc()->print();
+            std::printf("ERROR: Unable to determine label type\n");
+            std::exit(1);
+        }
         this->name = name;
     }
     SyntaxNodeLabelDecl::~SyntaxNodeLabelDecl(){
@@ -137,23 +146,86 @@ namespace luccix::assembler{
     }
     SyntaxSymbol::~SyntaxSymbol(){}
 
-    std::size_t SyntaxSymbol::getName(){
+    std::size_t SyntaxSymbol::getName() const{
         return this->name;
     }
-    std::size_t SyntaxSymbol::getValue(){
+    std::size_t SyntaxSymbol::getValue() const{
         return this->value;
     }
-    std::size_t SyntaxSymbol::getSymbolSize(){
+    std::size_t SyntaxSymbol::getSymbolSize() const{
         return this->symbolSize;
     }
-    SymbolType SyntaxSymbol::getSymbolType(){
+    SymbolType SyntaxSymbol::getSymbolType() const{
         return this->symbolType;
     }
-    SymbolBind SyntaxSymbol::getSymbolBind(){
+    SymbolBind SyntaxSymbol::getSymbolBind() const{
         return this->symbolBind;
     }
-    std::uint8_t SyntaxSymbol::getUnused(){
+    std::uint8_t SyntaxSymbol::getUnused() const{
         return this->unused;
+    }
+    // bool operator==(const SyntaxSymbol& lhs, const SyntaxSymbol& rhs) {
+    //     bool ok = true;
+    //     ok = ok && (lhs.getName() == rhs.getName());
+    //     ok = ok && (lhs.getValue() == rhs.getValue());
+    //     ok = ok && (lhs.getSymbolSize() == rhs.getSymbolSize());
+    //     ok = ok && (lhs.getSymbolType() == rhs.getSymbolType());
+    //     ok = ok && (lhs.getSymbolBind() == rhs.getSymbolBind());
+    //     ok = ok && (lhs.getUnused() == rhs.getUnused());
+    //     return ok;
+    // }
+    // Overload for pointers (ensures at least one parameter is a class)
+    bool operator==(const SyntaxSymbol* lhs, const SyntaxSymbol& rhs) {
+        if (!lhs) return false;
+        return *lhs == rhs;
+    }
+    bool operator==(const SyntaxSymbol& lhs, const SyntaxSymbol* rhs) {
+        if (!rhs) return false;
+        return lhs == *rhs;
+    }
+    bool SyntaxSymbol::operator==(SyntaxSymbol* other){
+        (void)other;
+        std::printf("Operator ==*\n");
+        return true;
+    }
+    bool SyntaxSymbol::operator==(SyntaxSymbol& other){
+        bool ok = true;
+        ok = ok && (this->getName() == other.getName());
+        ok = ok && (this->getValue() == other.getValue());
+        ok = ok && (this->getSymbolSize() == other.getSymbolSize());
+        ok = ok && (this->getSymbolType() == other.getSymbolType());
+        ok = ok && (this->getUnused() == other.getUnused());
+        return ok;
+    }
+    bool SyntaxSymbol::operator==(SyntaxSymbol*& other){
+        (void)other;
+        std::printf("Operator ==*&\n");
+        return true;
+    }
+    bool SyntaxSymbol::operator==(SyntaxSymbol&& other){
+        (void)other;
+        std::printf("Operator ==&&\n");
+        return true;
+    }
+    bool SyntaxSymbol::operator==(const SyntaxSymbol* other) const{
+        (void)other;
+        std::printf("Operator ==const *\n");
+        return true;
+    }
+    bool SyntaxSymbol::operator==(const SyntaxSymbol& other) const{
+        (void)other;
+        std::printf("Operator ==const &\n");
+        return true;
+    }
+    bool SyntaxSymbol::operator==(const SyntaxSymbol*& other) const{
+        (void)other;
+        std::printf("Operator ==const *&\n");
+        return true;
+    }
+    bool SyntaxSymbol::operator==(const SyntaxSymbol&& other) const{
+        (void)other;
+        std::printf("Operator ==const &&\n");
+        return true;
     }
     SyntaxNodeRegister::SyntaxNodeRegister(Token* registerToken, RegisterInfo info) :SyntaxNode(registerToken->getLoc(), SyntaxNodeType::Register){
         this->info = info;
